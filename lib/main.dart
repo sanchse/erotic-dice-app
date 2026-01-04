@@ -26,13 +26,13 @@ class EroticDiceApp extends StatelessWidget {
 class Dice {
   String title;
   final List<String> options;
+  static final Random _random = Random();
 
   Dice({required this.title, required this.options});
 
   /// Roll the dice and return a random option
   String roll() {
-    final random = Random();
-    return options[random.nextInt(options.length)];
+    return options[_random.nextInt(options.length)];
   }
 }
 
@@ -220,18 +220,12 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
                 Expanded(
                   child: TextFormField(
                     initialValue: _diceList[index].title,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Title',
-                      border: const OutlineInputBorder(),
-                      contentPadding: const EdgeInsets.symmetric(
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
                         horizontal: 12,
                         vertical: 8,
-                      ),
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.edit, size: 18),
-                        onPressed: () {
-                          // Title editing is handled by the text field
-                        },
                       ),
                     ),
                     onChanged: (value) => _updateDiceTitle(index, value),
