@@ -1,18 +1,43 @@
-# Erotic Dice App
+# Dados Eróticos App
 
-A Flutter mobile application for rolling erotic dice with customizable options.
+Una aplicación Flutter para lanzar dados eróticos con opciones completamente configurables y persistencia de datos.
 
-## Features
+## Características
 
-- **Configurable Dice Count**: Choose between 1 to 3 dice
-- **Customizable Titles**: Assign custom titles to each dice (default: Actions, Body Area, Time)
-- **Random Results**: Each dice displays a random result when rolled
-- **Predefined Options**:
-  - **Actions**: Kiss, Lick, Massage
-  - **Body Area**: Neck, Back, Hand
-  - **Time**: 5 seconds, 10 seconds, 30 seconds
-- **Responsive Design**: Mobile-friendly UI for both iOS and Android
-- **Material Design**: Clean and modern interface using Flutter Material Design
+### 🎲 **Funcionalidad Principal**
+- **Cantidad de Dados Configurable**: Elige entre 1 a 3 dados
+- **Títulos Personalizables**: Asigna títulos personalizados a cada dado
+- **Opciones Completamente Editables**: Modifica las opciones de cada dado según tus preferencias
+- **Resultados Aleatorios**: Cada dado muestra un resultado aleatorio al lanzarlo
+
+### 🎯 **Opciones Predeterminadas** (en Español):
+- **Acciones**: Besar, Lamer, Masajear, Tocar, Acariciar, Mordisquear
+- **Parte del Cuerpo**: Cuello, Espalda, Genitales, Pezones, Culo, Labios
+- **Tiempo**: 5 segundos, 10 segundos, 30 segundos, 1 minuto, 2 minutos
+
+### 💾 **Persistencia de Datos**
+- **Guardado Automático**: Todas las configuraciones se guardan automáticamente
+- **Recuperación de Datos**: Tus configuraciones se restauran al abrir la app
+- **Funciona en Web**: Utiliza localStorage para persistencia en navegadores
+
+### 🛠️ **Funciones Avanzadas**
+- **Editor de Opciones**: Interfaz intuitiva para modificar opciones por dado
+- **Restaurar Valores Predeterminados**: Opción para volver a la configuración original
+- **Panel de Debug**: Herramientas para troubleshooting de persistencia
+- **Indicadores de Estado**: Loading states y mensajes de confirmación
+- **Visualización Mejorada**: Opciones mostradas como chips para mejor UX
+
+### 🔒 **Seguridad**
+- **Validación de Entrada**: Protección contra caracteres maliciosos
+- **Límites de Texto**: Título (50 caracteres), Opciones (100 caracteres)
+- **Sanitización**: Filtrado automático de contenido potencialmente peligroso
+- **Límite de Opciones**: Máximo 20 opciones por dado
+
+### 🎨 **Interfaz de Usuario**
+- **Diseño Responsivo**: Compatible con móviles y web
+- **Material Design**: Interfaz moderna y limpia
+- **Completamente en Español**: Toda la aplicación localizada
+- **Feedback Visual**: Indicadores de carga y mensajes de éxito
 
 ## Getting Started
 
