@@ -34,8 +34,247 @@ class Dice {
 
   /// Roll the dice and return a random option
   String roll() {
-    return options[_random.nextInt(options.length)];
+    // Create a list of 6 options, filling empty slots with "?"
+    final fullOptions = List<String>.generate(6, (index) {
+      return index < options.length ? options[index] : '?';
+    });
+    return fullOptions[_random.nextInt(fullOptions.length)];
   }
+
+  /// Get all 6 options including question marks for empty slots
+  List<String> get fullOptions {
+    return List<String>.generate(6, (index) {
+      return index < options.length ? options[index] : '?';
+    });
+  }
+}
+
+/// 3D Dice Widget for realistic dice visualization
+class DiceWidget extends StatelessWidget {
+  final List<String> options;
+  final String? selectedOption;
+  final double size;
+  final bool isRolling;
+  final Animation<double>? rotationAnimation;
+  final Color color;
+
+  const DiceWidget({
+    super.key,
+    required this.options,
+    this.selectedOption,
+    this.size = 80,
+    this.isRolling = false,
+    this.rotationAnimation,
+    this.color = Colors.white,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (isRolling && rotationAnimation != null) {
+      return AnimatedBuilder(
+        animation: rotationAnimation!,
+        builder: (context, child) {
+          return Transform(
+            alignment: Alignment.center,
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001) // perspective
+              ..rotateX(rotationAnimation!.value * 2 * pi)
+              ..rotateY(rotationAnimation!.value * 1.5 * pi)
+              ..rotateZ(rotationAnimation!.value * 2.5 * pi),
+            child: _buildDice(),
+          );
+        },
+      );
+    } else {
+      // Static dice showing result
+      return _buildDice();
+    }
+  }
+
+  Widget _buildDice() {
+    return Container(
+      width: size,
+      height: size,
+      child: CustomPaint(
+        painter: DicePainter(
+          options: options,
+          selectedOption: selectedOption,
+          color: color,
+        ),
+      ),
+    );
+  }
+}
+
+/// Custom painter for 3D dice with text on faces
+class DicePainter extends CustomPainter {
+  final List<String> options;
+  final String? selectedOption;
+  final Color color;
+
+  DicePainter({
+    required this.options,
+    this.selectedOption,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final cubeSize = size.width * 0.65;
+    final depth = cubeSize * 0.4; // More balanced depth
+
+    // Enhanced shadow - positioned more naturally
+    final shadowPaint = Paint()
+      ..color = Colors.black.withOpacity(0.2)
+      ..style = PaintingStyle.fill
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+
+    // Draw shadow offset down and right
+    final shadowOffset = Offset(depth * 0.3, depth * 0.5);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(
+          center: center + shadowOffset,
+          width: cubeSize * 0.9,
+          height: cubeSize * 0.9,
+        ),
+        const Radius.circular(4),
+      ),
+      shadowPaint,
+    );
+
+    // Calculate cube vertices for isometric view
+    final halfSize = cubeSize / 2;
+    final isoX = depth * 0.6; // Isometric X offset
+    final isoY = depth * 0.35; // Isometric Y offset
+
+    // Front face vertices
+    final frontTL = Offset(center.dx - halfSize, center.dy - halfSize);
+    final frontTR = Offset(center.dx + halfSize, center.dy - halfSize);
+    final frontBL = Offset(center.dx - halfSize, center.dy + halfSize);
+    final frontBR = Offset(center.dx + halfSize, center.dy + halfSize);
+
+    // Back face vertices (with isometric offset)
+    final backTL = Offset(frontTL.dx + isoX, frontTL.dy - isoY);
+    final backTR = Offset(frontTR.dx + isoX, frontTR.dy - isoY);
+    final backBR = Offset(frontBR.dx + isoX, frontBR.dy - isoY);
+
+    // Paint for different faces with proper lighting
+    final frontPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          color,
+          _darkenColor(color, 0.1),
+        ],
+      ).createShader(Rect.fromLTRB(frontTL.dx, frontTL.dy, frontBR.dx, frontBR.dy))
+      ..style = PaintingStyle.fill;
+
+    final topPaint = Paint()
+      ..color = _lightenColor(color, 0.15) // Top face is lighter
+      ..style = PaintingStyle.fill;
+
+    final rightPaint = Paint()
+      ..color = _darkenColor(color, 0.25) // Right face is darker
+      ..style = PaintingStyle.fill;
+
+    final edgePaint = Paint()
+      ..color = Colors.black87
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+
+    // Draw top face
+    final topPath = Path()
+      ..moveTo(frontTL.dx, frontTL.dy)
+      ..lineTo(frontTR.dx, frontTR.dy)
+      ..lineTo(backTR.dx, backTR.dy)
+      ..lineTo(backTL.dx, backTL.dy)
+      ..close();
+    canvas.drawPath(topPath, topPaint);
+    canvas.drawPath(topPath, edgePaint);
+
+    // Draw right face
+    final rightPath = Path()
+      ..moveTo(frontTR.dx, frontTR.dy)
+      ..lineTo(frontBR.dx, frontBR.dy)
+      ..lineTo(backBR.dx, backBR.dy)
+      ..lineTo(backTR.dx, backTR.dy)
+      ..close();
+    canvas.drawPath(rightPath, rightPaint);
+    canvas.drawPath(rightPath, edgePaint);
+
+    // Draw front face with gradient
+    final frontPath = Path()
+      ..moveTo(frontTL.dx, frontTL.dy)
+      ..lineTo(frontTR.dx, frontTR.dy)
+      ..lineTo(frontBR.dx, frontBR.dy)
+      ..lineTo(frontBL.dx, frontBL.dy)
+      ..close();
+    canvas.drawPath(frontPath, frontPaint);
+    canvas.drawPath(frontPath, edgePaint);
+
+    // Draw text on front face
+    // For dice display, create a list of 6 options with "?" for empty slots
+    final diceOptions = List<String>.generate(6, (index) {
+      return index < options.length ? options[index] : '?';
+    });
+    String displayText = selectedOption ?? (diceOptions.isNotEmpty ? diceOptions[0] : '');
+    if (displayText.isNotEmpty) {
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: displayText,
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: _calculateFontSize(displayText, cubeSize),
+            fontWeight: FontWeight.bold,
+            shadows: [
+              Shadow(
+                offset: const Offset(0.5, 0.5),
+                blurRadius: 0.5,
+                color: Colors.black38,
+              ),
+            ],
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.center,
+      );
+
+      textPainter.layout(maxWidth: cubeSize - 20);
+      
+      final textCenter = Offset(
+        (frontTL.dx + frontBR.dx) / 2 - textPainter.width / 2,
+        (frontTL.dy + frontBR.dy) / 2 - textPainter.height / 2,
+      );
+
+      textPainter.paint(canvas, textCenter);
+    }
+  }
+
+  /// Helper method to lighten a color
+  Color _lightenColor(Color color, double amount) {
+    final hsl = HSLColor.fromColor(color);
+    final lightened = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+    return lightened.toColor();
+  }
+
+  /// Helper method to darken a color by a percentage
+  Color _darkenColor(Color color, double amount) {
+    final hsl = HSLColor.fromColor(color);
+    final darkened = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+    return darkened.toColor();
+  }
+
+  double _calculateFontSize(String text, double cubeSize) {
+    if (text.length <= 8) return cubeSize * 0.15;
+    if (text.length <= 12) return cubeSize * 0.12;
+    return cubeSize * 0.10;
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
 
 /// Main page for dice rolling functionality
@@ -204,7 +443,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   void _initializeDice() {
     _diceList = [
       Dice(
-        title: 'Acciones',
+        title: 'Acción',
         options: ['Besar', 'Lamer', 'Masajear', 'Tocar', 'Acariciar', 'Mordisquear'],
       ),
       Dice(
@@ -551,7 +790,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '${_diceList[i].options.length} opciones: ${_diceList[i].options.take(3).join(", ")}${_diceList[i].options.length > 3 ? "..." : ""}',
+                        '${_diceList[i].options.length}/6 opciones: ${_diceList[i].options.take(3).join(", ")}${_diceList[i].options.length > 3 ? "..." : ""}${_diceList[i].options.length < 6 ? " + ?" : ""}',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -590,35 +829,23 @@ class _DiceRollerPageState extends State<DiceRollerPage>
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 for (int i = 0; i < _numberOfDice; i++)
-                  AnimatedBuilder(
-                    animation: _diceAnimationController,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        scale: _diceScaleAnimation.value,
-                        child: Transform.rotate(
-                          angle: _diceRotationAnimation.value * 2 * 3.14159,
-                          child: Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: Colors.pink.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Colors.pink,
-                                width: 2,
-                              ),
-                            ),
-                            child: const Icon(
-                              Icons.casino,
-                              size: 32,
-                              color: Colors.pink,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                  DiceWidget(
+                    options: _diceList[i].fullOptions,
+                    size: 80,
+                    isRolling: true,
+                    rotationAnimation: _diceRotationAnimation,
+                    color: Colors.white,
                   ),
               ],
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Girando los dados...',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontStyle: FontStyle.italic,
+              ),
             ),
             const SizedBox(height: 16),
             LinearProgressIndicator(
@@ -944,64 +1171,52 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   Widget _buildResultsDisplay() {
     return Card(
       elevation: 4,
-      color: Colors.pink[50],
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const Text(
+              '¡Resultado!',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.pink,
+              ),
+            ),
+            const SizedBox(height: 20),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Icon(
-                  Icons.auto_awesome,
-                  color: Theme.of(context).primaryColor,
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  'Resultado',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                for (int i = 0; i < _rollResults!.length; i++)
+                  Column(
+                    children: [
+                      DiceWidget(
+                        options: _diceList[i].fullOptions,
+                        size: 80,
+                        isRolling: false,
+                        selectedOption: _rollResults![i],
+                        color: Colors.white,
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        constraints: const BoxConstraints(maxWidth: 100),
+                        child: Text(
+                          _diceList[i].title,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.pink,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
               ],
             ),
-            const SizedBox(height: 16),
-            for (int i = 0; i < _rollResults!.length; i++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        _diceList[i].title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Icon(Icons.arrow_forward, size: 20),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        _rollResults![i],
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
           ],
         ),
       ),
@@ -1068,7 +1283,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
     final sanitizedOptions = newOptions
         .map((option) => _sanitizeInput(option))
         .where((option) => option.isNotEmpty && option.length <= 100)
-        .take(20)
+        .take(6) // Limit to maximum 6 options for a dice
         .toList();
     
     setState(() {
@@ -1083,7 +1298,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
   /// Show dialog to edit dice options
   Future<void> _showEditOptionsDialog(int index) async {
     final TextEditingController controller = TextEditingController();
-    controller.text = _localDiceList[index].options.join('\\n');
+    controller.text = _localDiceList[index].options.join('\n');
 
     return showDialog<void>(
       context: context,
@@ -1097,15 +1312,20 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Ingresa cada opción en una nueva línea:',
+                  'Ingresa cada opción en una nueva línea (máximo 6 opciones):',
                   style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Las opciones faltantes se mostrarán como "?" en el dado.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: controller,
                   maxLines: 6,
                   decoration: const InputDecoration(
-                    hintText: 'Opción 1\\nOpción 2\\nOpción 3',
+                    hintText: 'Opción 1\nOpción 2\nOpción 3\nOpción 4\nOpción 5\nOpción 6',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -1123,7 +1343,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
               child: const Text('Guardar'),
               onPressed: () {
                 final newOptions = controller.text
-                    .split('\\n')
+                    .split('\n')
                     .map((s) => s.trim())
                     .where((s) => s.isNotEmpty)
                     .toList();
@@ -1133,6 +1353,75 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Opciones guardadas exitosamente'),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+                }
+                
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Remove an option from a specific dice
+  void _removeOption(int diceIndex, int optionIndex) {
+    if (_localDiceList[diceIndex].options.length > 1) {
+      setState(() {
+        _localDiceList[diceIndex].options.removeAt(optionIndex);
+      });
+    }
+  }
+
+  /// Show dialog to add a new option
+  Future<void> _showAddOptionDialog(int index) async {
+    final TextEditingController controller = TextEditingController();
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Agregar Opción a ${_localDiceList[index].title}'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'Nueva opción',
+              border: OutlineInputBorder(),
+            ),
+            autofocus: true,
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Agregar'),
+              onPressed: () {
+                final newOption = _sanitizeInput(controller.text);
+                
+                if (newOption.isNotEmpty && 
+                    _localDiceList[index].options.length < 6 &&
+                    !_localDiceList[index].options.contains(newOption)) {
+                  setState(() {
+                    _localDiceList[index].options.add(newOption);
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Opción "$newOption" agregada exitosamente'),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+                } else if (_localDiceList[index].options.contains(newOption)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Esta opción ya existe'),
                       duration: Duration(seconds: 1),
                     ),
                   );
@@ -1280,16 +1569,51 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
               child: Wrap(
                 spacing: 8,
                 runSpacing: 4,
-                children: _localDiceList[index].options.map((option) {
-                  return Chip(
-                    label: Text(
-                      option,
-                      style: const TextStyle(fontSize: 12),
+                children: [
+                  // Existing option chips with delete functionality
+                  ..._localDiceList[index].options.asMap().entries.map((entry) {
+                    int optionIndex = entry.key;
+                    String option = entry.value;
+                    return Chip(
+                      label: Text(
+                        option,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      deleteIcon: const Icon(Icons.close, size: 16),
+                      onDeleted: _localDiceList[index].options.length > 1 
+                          ? () => _removeOption(index, optionIndex)
+                          : null, // Prevent deleting if only one option left
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                    );
+                  }).toList(),
+                  // Add option chip (only show if less than 6 options)
+                  if (_localDiceList[index].options.length < 6)
+                    ActionChip(
+                      label: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.add, size: 14),
+                          SizedBox(width: 4),
+                          Text('Agregar', style: TextStyle(fontSize: 12)),
+                        ],
+                      ),
+                      onPressed: () => _showAddOptionDialog(index),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                      backgroundColor: Colors.green[100],
                     ),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
-                  );
-                }).toList(),
+                  // Show question mark chips for empty slots
+                  ...List.generate(
+                    6 - _localDiceList[index].options.length,
+                    (emptyIndex) => Chip(
+                      label: const Text('?', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      backgroundColor: Colors.grey[200],
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
