@@ -38,6 +38,47 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Security & Environment Files
+.env
+.env.local
+.env.production
+.env.staging
+*.pem
+*.p12
+*.keystore
+key.properties
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+
+# API Keys and Secrets
+**/secrets/
+**/keys/
+**/*_secret.dart
+**/*_config.dart
+api_keys.dart
+config.dart
+
+# Code signing and certificates
+*.mobileprovision
+*.cer
+*.p8
+*.certSigningRequest
+
+# Sensitive logs
+*.crash
+*.stackdump
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Backup files
+*.backup
+*.bak
+*.orig
+
 # Web related
 /web/
 

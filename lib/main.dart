@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 void main() {
   runApp(const EroticDiceApp());
@@ -12,7 +14,7 @@ class EroticDiceApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Erotic Dice',
+      title: 'Dados Eróticos',
       theme: ThemeData(
         primarySwatch: Colors.pink,
         useMaterial3: true,
@@ -53,30 +55,123 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
   
   // Results from the last roll
   List<String>? _rollResults;
+  
+  // Loading state for initialization
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _initializeDice();
+    _loadSavedConfiguration();
+  }
+
+  /// Load saved dice configuration from SharedPreferences
+  Future<void> _loadSavedConfiguration() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedConfig = prefs.getString('dice_configuration');
+      
+      debugPrint('Loading configuration: $savedConfig');
+      
+      if (savedConfig != null && savedConfig.isNotEmpty) {
+        final configData = json.decode(savedConfig) as Map<String, dynamic>;
+        final numberOfDice = configData['numberOfDice'] as int? ?? 3;
+        final diceConfigs = configData['diceList'] as List<dynamic>? ?? [];
+        
+        debugPrint('Loaded numberOfDice: $numberOfDice');
+        debugPrint('Loaded diceConfigs: $diceConfigs');
+        
+        setState(() {
+          _numberOfDice = numberOfDice;
+          _diceList = diceConfigs.map((config) {
+            final configMap = config as Map<String, dynamic>;
+            return Dice(
+              title: configMap['title'] as String,
+              options: List<String>.from(configMap['options'] as List),
+            );
+          }).toList();
+          
+          // Ensure we have at least the required number of dice
+          while (_diceList.length < 3) {
+            _diceList.add(Dice(
+              title: 'Dado ${_diceList.length + 1}',
+              options: ['Opción 1', 'Opción 2', 'Opción 3'],
+            ));
+          }
+        });
+        
+        debugPrint('Configuration loaded successfully');
+      } else {
+        // No saved configuration, use defaults
+        debugPrint('No saved configuration found, using defaults');
+        _initializeDice();
+      }
+    } catch (e) {
+      // If there's an error loading, fall back to defaults
+      debugPrint('Error loading configuration: $e');
+      _initializeDice();
+    }
+    
+    // Clear results when loading and set loading to false
+    setState(() {
+      _rollResults = null;
+      _isLoading = false;
+    });
+  }
+
+  /// Save current dice configuration to SharedPreferences
+  Future<void> _saveConfiguration() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final configData = {
+        'numberOfDice': _numberOfDice,
+        'diceList': _diceList.map((dice) => {
+          'title': dice.title,
+          'options': dice.options,
+        }).toList(),
+      };
+      
+      final jsonString = json.encode(configData);
+      debugPrint('Saving configuration: $jsonString');
+      
+      final success = await prefs.setString('dice_configuration', jsonString);
+      debugPrint('Save successful: $success');
+      
+      // Verify the save by reading it back
+      final savedValue = prefs.getString('dice_configuration');
+      debugPrint('Verification read: $savedValue');
+      
+    } catch (e) {
+      // Handle save error with more detail
+      debugPrint('Error saving configuration: $e');
+    }
   }
 
   /// Initialize dice with default configurations
   void _initializeDice() {
     _diceList = [
       Dice(
-        title: 'Actions',
-        options: ['Kiss', 'Lick', 'Massage'],
+        title: 'Acciones',
+        options: ['Besar', 'Lamer', 'Masajear', 'Tocar', 'Acariciar', 'Mordisquear'],
       ),
       Dice(
-        title: 'Body Area',
-        options: ['Neck', 'Back', 'Hand'],
+        title: 'Parte del Cuerpo',
+        options: ['Cuello', 'Espalda', 'Genitales', 'Pezones', 'Culo', 'Labios'],
       ),
       Dice(
-        title: 'Time',
-        options: ['5 seconds', '10 seconds', '30 seconds'],
+        title: 'Tiempo',
+        options: ['5 segundos', '10 segundos', '30 segundos', '1 minuto', '2 minutos'],
       ),
     ];
     _rollResults = null;
+  }
+
+  /// Reset dice to default configurations
+  void _resetToDefaults() async {
+    setState(() {
+      _initializeDice();
+    });
+    await _saveConfiguration();
   }
 
   /// Roll all active dice and update results
@@ -90,44 +185,292 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
   }
 
   /// Update the title of a specific dice
-  void _updateDiceTitle(int index, String newTitle) {
+  void _updateDiceTitle(int index, String newTitle) async {
+    // Input validation and sanitization
+    final sanitizedTitle = _sanitizeInput(newTitle);
+    if (sanitizedTitle.isEmpty || sanitizedTitle.length > 50) {
+      return; // Ignore invalid input
+    }
+    
     setState(() {
-      _diceList[index].title = newTitle;
+      _diceList[index].title = sanitizedTitle;
     });
+    await _saveConfiguration();
+  }
+
+  /// Update the options of a specific dice
+  void _updateDiceOptions(int index, List<String> newOptions) async {
+    // Input validation and sanitization
+    final sanitizedOptions = newOptions
+        .map((option) => _sanitizeInput(option))
+        .where((option) => option.isNotEmpty && option.length <= 100)
+        .take(20) // Limit to maximum 20 options
+        .toList();
+    
+    setState(() {
+      _diceList[index].options.clear();
+      _diceList[index].options.addAll(sanitizedOptions);
+      if (_diceList[index].options.isEmpty) {
+        _diceList[index].options.add('Opción Predeterminada');
+      }
+    });
+    await _saveConfiguration();
+  }
+
+  /// Sanitize user input to prevent security issues
+  String _sanitizeInput(String input) {
+    return input
+        .trim()
+        .replaceAll(RegExp(r'[<>\"\'&]'), '') // Remove potentially dangerous characters
+        .replaceAll(RegExp(r'\s+'), ' '); // Normalize whitespace
+  }
+
+  /// Show dialog to edit dice options
+  Future<void> _showEditOptionsDialog(int index) async {
+    final TextEditingController controller = TextEditingController();
+    controller.text = _diceList[index].options.join('\n');
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Editar Opciones para ${_diceList[index].title}'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Ingresa cada opción en una nueva línea:',
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: controller,
+                  maxLines: 6,
+                  decoration: const InputDecoration(
+                    hintText: 'Opción 1\nOpción 2\nOpción 3',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: const Text('Guardar'),
+              onPressed: () {
+                final newOptions = controller.text
+                    .split('\n')
+                    .map((s) => s.trim())
+                    .where((s) => s.isNotEmpty)
+                    .toList();
+                
+                if (newOptions.isNotEmpty) {
+                  _updateDiceOptions(index, newOptions);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Opciones guardadas exitosamente'),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+                }
+                
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Show confirmation dialog for resetting to defaults
+  Future<void> _showResetConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Restaurar Valores Predeterminados'),
+          content: const Text(
+            'Esto restaurará todos los títulos y opciones de los dados a sus valores predeterminados. ¿Estás seguro?',
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Restaurar'),
+              onPressed: () {
+                _resetToDefaults();
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Dados restaurados a la configuración predeterminada'),
+                  ),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Show debug dialog for persistence testing
+  Future<void> _showDebugDialog() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedConfig = prefs.getString('dice_configuration');
+    
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Debug Persistencia'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Configuración guardada:'),
+                const SizedBox(height: 8),
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    savedConfig ?? 'No hay configuración guardada',
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text('Configuración actual:'),
+                const SizedBox(height: 8),
+                Text('Número de dados: $_numberOfDice'),
+                for (int i = 0; i < _diceList.length; i++)
+                  Text('Dado ${i + 1}: ${_diceList[i].title} - ${_diceList[i].options.join(", ")}'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Guardar Ahora'),
+              onPressed: () async {
+                await _saveConfiguration();
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Configuración guardada manualmente')),
+                );
+              },
+            ),
+            TextButton(
+              child: const Text('Cerrar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Erotic Dice'),
+        title: const Text('Dados Eróticos'),
         elevation: 2,
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (String result) {
+              if (result == 'reset') {
+                _showResetConfirmationDialog();
+              } else if (result == 'debug') {
+                _showDebugDialog();
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'reset',
+                child: Row(
+                  children: [
+                    Icon(Icons.refresh),
+                    SizedBox(width: 8),
+                    Text('Restaurar Valores Predeterminados'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'debug',
+                child: Row(
+                  children: [
+                    Icon(Icons.bug_report),
+                    SizedBox(width: 8),
+                    Text('Debug Persistencia'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Dice configuration section
-                _buildDiceConfigurationSection(),
-                const SizedBox(height: 24),
-                
-                // Dice display section
-                _buildDiceDisplaySection(),
-                const SizedBox(height: 32),
-                
-                // Roll button
-                _buildRollButton(),
-                const SizedBox(height: 32),
-                
-                // Results display
-                if (_rollResults != null) _buildResultsDisplay(),
-              ],
+        child: _isLoading 
+          ? const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Cargando tu configuración de dados...'),
+                ],
+              ),
+            )
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Dice configuration section
+                    _buildDiceConfigurationSection(),
+                    const SizedBox(height: 24),
+                    
+                    // Dice display section
+                    _buildDiceDisplaySection(),
+                    const SizedBox(height: 32),
+                    
+                    // Roll button
+                    _buildRollButton(),
+                    const SizedBox(height: 32),
+                    
+                    // Results display
+                    if (_rollResults != null) _buildResultsDisplay(),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
       ),
     );
   }
@@ -142,7 +485,7 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Number of Dice',
+              'Número de Dados',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -164,6 +507,7 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
                             _numberOfDice = i;
                             _rollResults = null; // Clear results when changing dice count
                           });
+                          _saveConfiguration();
                         }
                       },
                     ),
@@ -182,7 +526,7 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Dice Configuration',
+          'Configuración de Dados',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -198,7 +542,7 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
     );
   }
 
-  /// Build a card for an individual dice with editable title
+  /// Build a card for an individual dice with editable title and options
   Widget _buildDiceCard(int index) {
     return Card(
       elevation: 1,
@@ -210,7 +554,7 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
             Row(
               children: [
                 Text(
-                  'Dice ${index + 1}',
+                  'Dado ${index + 1}',
                   style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     color: Colors.grey,
@@ -221,7 +565,7 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
                   child: TextFormField(
                     initialValue: _diceList[index].title,
                     decoration: const InputDecoration(
-                      labelText: 'Title',
+                      labelText: 'Título',
                       border: OutlineInputBorder(),
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: 12,
@@ -233,12 +577,49 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Options: ${_diceList[index].options.join(', ')}',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Text(
+                  'Opciones:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+                const Spacer(),
+                TextButton.icon(
+                  icon: const Icon(Icons.edit, size: 16),
+                  label: const Text('Editar'),
+                  onPressed: () => _showEditOptionsDialog(index),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: _diceList[index].options.map((option) {
+                  return Chip(
+                    label: Text(
+                      option,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  );
+                }).toList(),
               ),
             ),
           ],
@@ -266,7 +647,7 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
           Icon(Icons.casino, size: 28),
           SizedBox(width: 12),
           Text(
-            'Roll Dice',
+            'Lanzar Dados',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -295,7 +676,7 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
                 ),
                 const SizedBox(width: 8),
                 const Text(
-                  'Result',
+                  'Resultado',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
