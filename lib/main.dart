@@ -46,7 +46,8 @@ class DiceRollerPage extends StatefulWidget {
   State<DiceRollerPage> createState() => _DiceRollerPageState();
 }
 
-class _DiceRollerPageState extends State<DiceRollerPage> {
+class _DiceRollerPageState extends State<DiceRollerPage> 
+    with TickerProviderStateMixin {
   // Number of dice to display (1-3)
   int _numberOfDice = 3;
   
@@ -58,11 +59,63 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
   
   // Loading state for initialization
   bool _isLoading = true;
+  
+  // Animation state and controllers
+  bool _isRolling = false;
+  late AnimationController _diceAnimationController;
+  late AnimationController _resultAnimationController;
+  late Animation<double> _diceRotationAnimation;
+  late Animation<double> _diceScaleAnimation;
+  late Animation<double> _resultFadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    
+    // Initialize animation controllers
+    _diceAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    
+    _resultAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    
+    // Initialize animations
+    _diceRotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 4.0, // 4 full rotations
+    ).animate(CurvedAnimation(
+      parent: _diceAnimationController,
+      curve: Curves.easeInOut,
+    ));
+    
+    _diceScaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.2,
+    ).animate(CurvedAnimation(
+      parent: _diceAnimationController,
+      curve: Curves.elasticInOut,
+    ));
+    
+    _resultFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _resultAnimationController,
+      curve: Curves.easeIn,
+    ));
+    
     _loadSavedConfiguration();
+  }
+
+  @override
+  void dispose() {
+    _diceAnimationController.dispose();
+    _resultAnimationController.dispose();
+    super.dispose();
   }
 
   /// Load saved dice configuration from SharedPreferences
@@ -174,14 +227,34 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
     await _saveConfiguration();
   }
 
-  /// Roll all active dice and update results
-  void _rollDice() {
+  /// Roll all active dice and update results with animation
+  void _rollDice() async {
     setState(() {
-      _rollResults = [];
-      for (int i = 0; i < _numberOfDice; i++) {
-        _rollResults!.add(_diceList[i].roll());
-      }
+      _isRolling = true;
+      _rollResults = null;
     });
+    
+    // Start dice animation
+    _diceAnimationController.reset();
+    _diceAnimationController.forward();
+    
+    // Wait for animation to complete
+    await Future.delayed(const Duration(milliseconds: 1500));
+    
+    // Generate results
+    final results = <String>[];
+    for (int i = 0; i < _numberOfDice; i++) {
+      results.add(_diceList[i].roll());
+    }
+    
+    setState(() {
+      _rollResults = results;
+      _isRolling = false;
+    });
+    
+    // Animate results appearance
+    _resultAnimationController.reset();
+    _resultAnimationController.forward();
   }
 
   /// Update the title of a specific dice
@@ -496,6 +569,68 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
     );
   }
 
+  /// Build animated dice section during rolling
+  Widget _buildAnimatedDiceSection() {
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            const Text(
+              '¡Lanzando dados!',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.pink,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                for (int i = 0; i < _numberOfDice; i++)
+                  AnimatedBuilder(
+                    animation: _diceAnimationController,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _diceScaleAnimation.value,
+                        child: Transform.rotate(
+                          angle: _diceRotationAnimation.value * 2 * 3.14159,
+                          child: Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: Colors.pink.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.pink,
+                                width: 2,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.casino,
+                              size: 32,
+                              color: Colors.pink,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            LinearProgressIndicator(
+              backgroundColor: Colors.pink.withOpacity(0.2),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.pink),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -588,12 +723,20 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
                     _buildDiceSummaryCard(),
                     const SizedBox(height: 24),
                     
+                    // Animated dice section
+                    if (_isRolling) _buildAnimatedDiceSection(),
+                    if (_isRolling) const SizedBox(height: 24),
+                    
                     // Roll button
                     _buildRollButton(),
                     const SizedBox(height: 32),
                     
                     // Results display
-                    if (_rollResults != null) _buildResultsDisplay(),
+                    if (_rollResults != null && !_isRolling) 
+                      FadeTransition(
+                        opacity: _resultFadeAnimation,
+                        child: _buildResultsDisplay(),
+                      ),
                   ],
                 ),
               ),
@@ -758,24 +901,36 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
   /// Build the roll button
   Widget _buildRollButton() {
     return ElevatedButton(
-      onPressed: _rollDice,
+      onPressed: _isRolling ? null : _rollDice,
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 20),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: _isRolling 
+            ? Colors.grey 
+            : Theme.of(context).primaryColor,
         foregroundColor: Colors.white,
         elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.casino, size: 28),
-          SizedBox(width: 12),
+          if (_isRolling)
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            )
+          else
+            const Icon(Icons.casino, size: 28),
+          const SizedBox(width: 12),
           Text(
-            'Lanzar Dados',
-            style: TextStyle(
+            _isRolling ? 'Lanzando...' : 'Lanzar Dados',
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
