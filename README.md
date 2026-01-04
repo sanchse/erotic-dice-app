@@ -21,10 +21,20 @@ Una aplicación Flutter para lanzar dados eróticos con opciones completamente c
 - **Funciona en Web**: Utiliza localStorage para persistencia en navegadores
 
 ### 🛠️ **Funciones Avanzadas**
-- **Editor de Opciones**: Interfaz intuitiva para modificar opciones por dado
+- **Página de Configuración Dedicada**: Pantalla separada para gestionar toda la configuración
+- **Editor de Opciones Avanzado**: Interfaz intuitiva para modificar opciones por dado
+- **Resumen de Configuración**: Vista previa de la configuración actual en la página principal
+- **Navegación Intuitiva**: Acceso fácil a configuración desde el menú principal
+- **Aplicación de Cambios**: Los cambios se aplican solo cuando el usuario confirma
 - **Restaurar Valores Predeterminados**: Opción para volver a la configuración original
 - **Panel de Debug**: Herramientas para troubleshooting de persistencia
 - **Indicadores de Estado**: Loading states y mensajes de confirmación
+
+### 📱 **Experiencia de Usuario**
+- **Interfaz Principal Limpia**: Página principal enfocada en lanzar dados
+- **Configuración Separada**: Gestión de configuración sin interrumpir el uso
+- **Feedback Visual Mejorado**: Confirmaciones y estados de carga claros
+- **Navegación Fluida**: Transiciones suaves entre páginas
 - **Visualización Mejorada**: Opciones mostradas como chips para mejor UX
 
 ### 🔒 **Seguridad**
@@ -37,7 +47,9 @@ Una aplicación Flutter para lanzar dados eróticos con opciones completamente c
 - **Diseño Responsivo**: Compatible con móviles y web
 - **Material Design**: Interfaz moderna y limpia
 - **Completamente en Español**: Toda la aplicación localizada
-- **Feedback Visual**: Indicadores de carga y mensajes de éxito
+- **Arquitectura de Páginas**: Separación clara entre funcionalidad principal y configuración
+- **Botones de Acción Flotantes**: Fácil acceso a acciones importantes
+- **Iconografía Intuitiva**: Iconos claros para todas las funciones
 
 ## Getting Started
 
