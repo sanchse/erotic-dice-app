@@ -2267,19 +2267,21 @@ class _KamasutraPageState extends State<KamasutraPage>
               Text(
                 _currentPosition!.name,
                 style: const TextStyle(
-                  fontSize: 28,
+                  fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.red,
                 ),
                 textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
               ),
               
               const SizedBox(height: 16),
               
               // Image placeholder (will show actual image if available)
               Container(
-                width: 300,
-                height: 300,
+                width: 280,
+                height: 220,
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
                   borderRadius: BorderRadius.circular(16),
@@ -2296,10 +2298,10 @@ class _KamasutraPageState extends State<KamasutraPage>
                       if (snapshot.data == true) {
                         // Show actual SVG image if it exists
                         return Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(12.0),
                           child: SizedBox(
-                            width: 268,
-                            height: 268,
+                            width: 220,
+                            height: 180,
                             child: SvgPicture.asset(
                               'assets/kamasutra/${_currentPosition!.image}',
                               fit: BoxFit.contain,
@@ -2320,7 +2322,7 @@ class _KamasutraPageState extends State<KamasutraPage>
               
               // Description
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
                   borderRadius: BorderRadius.circular(12),
@@ -2328,10 +2330,12 @@ class _KamasutraPageState extends State<KamasutraPage>
                 child: Text(
                   _currentPosition!.description,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     color: Colors.grey.shade700,
                   ),
                   textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 3,
                 ),
               ),
             ],
