@@ -1,0 +1,39 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo circular rosado -->
+  <circle cx="256" cy="256" r="240" fill="#FF6B9D" stroke="#E91E63" stroke-width="8"/>
+  
+  <!-- Dado 1 -->
+  <g transform="translate(160,180)">
+    <!-- Cara frontal -->
+    <path d="M0,0 L80,0 L80,80 L0,80 Z" fill="#FFFFFF" stroke="#333" stroke-width="3"/>
+    <!-- Cara superior -->
+    <path d="M0,0 L20,-20 L100,-20 L80,0 Z" fill="#F5F5F5" stroke="#333" stroke-width="3"/>
+    <!-- Cara lateral -->
+    <path d="M80,0 L100,-20 L100,60 L80,80 Z" fill="#E8E8E8" stroke="#333" stroke-width="3"/>
+    <!-- Punto central -->
+    <circle cx="40" cy="40" r="8" fill="#E91E63"/>
+  </g>
+  
+  <!-- Dado 2 -->
+  <g transform="translate(280,220)">
+    <!-- Cara frontal -->
+    <path d="M0,0 L80,0 L80,80 L0,80 Z" fill="#FFFFFF" stroke="#333" stroke-width="3"/>
+    <!-- Cara superior -->
+    <path d="M0,0 L20,-20 L100,-20 L80,0 Z" fill="#F5F5F5" stroke="#333" stroke-width="3"/>
+    <!-- Cara lateral -->
+    <path d="M80,0 L100,-20 L100,60 L80,80 Z" fill="#E8E8E8" stroke="#333" stroke-width="3"/>
+    <!-- Dos puntos -->
+    <circle cx="25" cy="25" r="6" fill="#E91E63"/>
+    <circle cx="55" cy="55" r="6" fill="#E91E63"/>
+  </g>
+  
+  <!-- Corazón decorativo -->
+  <g transform="translate(256,320)">
+    <path d="M0,15 C0,7 7,0 15,0 C23,0 30,7 30,15 C30,23 15,35 15,35 S0,23 0,15 Z" 
+          fill="#FFFFFF" opacity="0.8"/>
+  </g>
+  
+  <!-- Texto "ED" (Erotic Dice) -->
+  <text x="256" y="420" text-anchor="middle" font-family="Arial Black, sans-serif" 
+        font-size="48" font-weight="bold" fill="#FFFFFF">ED</text>
+</svg>
