@@ -57,7 +57,6 @@ class MainMenuPage extends StatelessWidget {
                 Icons.casino,
                 size: 80,
                 color: Colors.pink,
-              ),
               const SizedBox(height: 24),
               const Text(
                 '¡Elige tu tipo de dados!',
@@ -67,13 +66,12 @@ class MainMenuPage extends StatelessWidget {
                   color: Colors.pink,
                 ),
                 textAlign: TextAlign.center,
-              ),
               const SizedBox(height: 40),
               _buildMenuCard(
                 context,
                 title: 'Dados Tradicionales',
                 subtitle: 'Acciones, partes del cuerpo y tiempo',
-                imagePath: 'assets/kamasutra/default.svg',
+                icon: Icons.text_fields,
                 color: Colors.blue,
                 onTap: () {
                   Navigator.push(
@@ -81,13 +79,12 @@ class MainMenuPage extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => const DiceRollerPage()),
                   );
                 },
-              ),
               const SizedBox(height: 20),
               _buildMenuCard(
                 context,
                 title: 'Dados Kamasutra',
                 subtitle: 'Posiciones con imágenes ilustrativas',
-                imagePath: 'assets/kamasutra/logo.svg',
+                icon: Icons.image,
                 color: Colors.red,
                 onTap: () {
                   Navigator.push(
@@ -95,7 +92,6 @@ class MainMenuPage extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => const KamasutraPage()),
                   );
                 },
-              ),
             ],
           ),
         ),
@@ -107,7 +103,7 @@ class MainMenuPage extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String subtitle,
-    required String imagePath,
+    required IconData icon,
     required Color color,
     required VoidCallback onTap,
   }) {
@@ -141,13 +137,11 @@ class MainMenuPage extends StatelessWidget {
                   color: color.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: SvgPicture.asset(
-                  imagePath,
-                  width: 32,
-                  height: 32,
-                  colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: color,
                 ),
-              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -171,11 +165,9 @@ class MainMenuPage extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
               Icon(
                 Icons.arrow_forward_ios,
                 color: color,
-              ),
             ],
           ),
         ),
@@ -394,7 +386,6 @@ class DicePainter extends CustomPainter {
                 offset: const Offset(0.5, 0.5),
                 blurRadius: 0.5,
                 color: Colors.black38,
-              ),
             ],
           ),
         ),
@@ -428,9 +419,9 @@ class DicePainter extends CustomPainter {
   }
 
   double _calculateFontSize(String text, double cubeSize) {
-    if (text.length <= 8) return cubeSize * 0.22;  // Reducido de 0.25 a 0.22
-    if (text.length <= 12) return cubeSize * 0.18; // Reducido de 0.21 a 0.18
-    return cubeSize * 0.15; // Reducido de 0.18 a 0.15
+    if (text.length <= 8) return cubeSize * 0.15;
+    if (text.length <= 12) return cubeSize * 0.12;
+    return cubeSize * 0.10;
   }
 
   @override
@@ -786,7 +777,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
-              ),
               child: const Text('Restaurar'),
               onPressed: () {
                 _resetToDefaults();
@@ -924,7 +914,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
-              ),
             ),
             const SizedBox(height: 12),
             for (int i = 0; i < _numberOfDice; i++)
@@ -961,33 +950,53 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     ),
                   ],
                 ),
-              ),
           ],
         ),
       ),
     );
   }
 
+  /// Build animated dice section during rolling
   Widget _buildAnimatedDiceSection() {
     return Card(
       elevation: 4,
       child: Padding(
-        padding: const EdgeInsets.all(16.0), // Reducido de 20.0 a 16.0
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            // Solo mostrar los dados girando - el estado se muestra en el botón
+            const Text(
+              '¡Lanzando dados!',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.pink,
+            ),
+            const SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround, // Cambiado de spaceEvenly a spaceAround
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 for (int i = 0; i < _numberOfDice; i++)
                   DiceWidget(
                     options: _diceList[i].fullOptions,
-                    size: 110, // Reducido de 120 a 110
+                    size: 80,
                     isRolling: true,
                     rotationAnimation: _diceRotationAnimation,
                     color: Colors.white,
                   ),
               ],
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Girando los dados...',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontStyle: FontStyle.italic,
+            ),
+            const SizedBox(height: 16),
+            LinearProgressIndicator(
+              backgroundColor: Colors.pink.withOpacity(0.2),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.pink),
             ),
           ],
         ),
@@ -1040,7 +1049,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     Text('Configuración'),
                   ],
                 ),
-              ),
               const PopupMenuItem<String>(
                 value: 'reset',
                 child: Row(
@@ -1050,7 +1058,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     Text('Restaurar Valores Predeterminados'),
                   ],
                 ),
-              ),
               const PopupMenuItem<String>(
                 value: 'debug',
                 child: Row(
@@ -1060,7 +1067,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     Text('Debug Persistencia'),
                   ],
                 ),
-              ),
             ],
           ),
         ],
@@ -1075,7 +1081,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                   SizedBox(height: 16),
                   Text('Cargando tu configuración de dados...'),
                 ],
-              ),
             )
           : SingleChildScrollView(
               child: Padding(
@@ -1083,13 +1088,17 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Roll button - siempre visible en la misma posición
-                    _buildRollButton(),
+                    // Dice summary card
+                    _buildDiceSummaryCard(),
                     const SizedBox(height: 24),
                     
-                    // Animated dice section - aparece debajo del botón
+                    // Animated dice section
                     if (_isRolling) _buildAnimatedDiceSection(),
                     if (_isRolling) const SizedBox(height: 24),
+                    
+                    // Roll button
+                    _buildRollButton(),
+                    const SizedBox(height: 32),
                     
                     // Results display
                     if (_rollResults != null && !_isRolling) 
@@ -1099,7 +1108,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                       ),
                   ],
                 ),
-              ),
             ),
       ),
     );
@@ -1119,7 +1127,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-              ),
             ),
             const SizedBox(height: 12),
             Row(
@@ -1236,7 +1243,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.grey[300]!),
-              ),
               child: Wrap(
                 spacing: 8,
                 runSpacing: 4,
@@ -1250,7 +1256,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     visualDensity: VisualDensity.compact,
                   );
                 }).toList(),
-              ),
             ),
           ],
         ),
@@ -1283,7 +1288,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
             )
           else
             const Icon(Icons.casino, size: 28),
@@ -1300,11 +1304,12 @@ class _DiceRollerPageState extends State<DiceRollerPage>
     );
   }
 
+  /// Build the results display section
   Widget _buildResultsDisplay() {
     return Card(
       elevation: 4,
       child: Padding(
-        padding: const EdgeInsets.all(16.0), // Reducido de 20.0 a 16.0
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -1314,25 +1319,24 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colors.pink,
-              ),
             ),
             const SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround, // Cambiado de spaceEvenly a spaceAround
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 for (int i = 0; i < _rollResults!.length; i++)
                   Column(
                     children: [
                       DiceWidget(
                         options: _diceList[i].fullOptions,
-                        size: 110, // Reducido de 120 a 110
+                        size: 80,
                         isRolling: false,
                         selectedOption: _rollResults![i],
                         color: Colors.white,
                       ),
                       const SizedBox(height: 12),
                       Container(
-                        constraints: const BoxConstraints(maxWidth: 110),
+                        constraints: const BoxConstraints(maxWidth: 100),
                         child: Text(
                           _diceList[i].title,
                           style: const TextStyle(
@@ -1582,7 +1586,6 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-              ),
             ),
             const SizedBox(height: 12),
             Row(
@@ -1697,7 +1700,6 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.grey[300]!),
-              ),
               child: Wrap(
                 spacing: 8,
                 runSpacing: 4,
@@ -1710,6 +1712,8 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                       label: Text(
                         option,
                         style: const TextStyle(fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                       deleteIcon: const Icon(Icons.close, size: 16),
                       onDeleted: _localDiceList[index].options.length > 1 
@@ -1746,7 +1750,6 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                     ),
                   ),
                 ],
-              ),
             ),
           ],
         ),
@@ -1783,7 +1786,6 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                     Text('Restaurar Valores Predeterminados'),
                   ],
                 ),
-              ),
             ],
           ),
         ],
@@ -2005,7 +2007,6 @@ class _KamasutraPageState extends State<KamasutraPage>
                 Icons.image,
                 size: 80,
                 color: Colors.red.shade300,
-              ),
               const SizedBox(height: 8),
               Text(
                 'Imagen no disponible',
@@ -2014,7 +2015,6 @@ class _KamasutraPageState extends State<KamasutraPage>
                   color: Colors.red.shade400,
                 ),
                 textAlign: TextAlign.center,
-              ),
             ],
           ),
         ),
@@ -2146,7 +2146,6 @@ class _KamasutraPageState extends State<KamasutraPage>
                 Icons.touch_app,
                 size: 64,
                 color: Colors.red.shade300,
-              ),
               const SizedBox(height: 16),
               Text(
                 '¡Lanza el dado para descubrir\nuna nueva posición!',
@@ -2155,7 +2154,6 @@ class _KamasutraPageState extends State<KamasutraPage>
                   color: Colors.grey.shade600,
                 ),
                 textAlign: TextAlign.center,
-              ),
             ],
           ),
         ),
@@ -2199,7 +2197,6 @@ class _KamasutraPageState extends State<KamasutraPage>
                     ),
                   );
                 },
-              ),
               const SizedBox(height: 24),
               const Text(
                 '¡Descubriendo tu posición!',
@@ -2208,7 +2205,6 @@ class _KamasutraPageState extends State<KamasutraPage>
                   fontWeight: FontWeight.bold,
                   color: Colors.red,
                 ),
-              ),
               const SizedBox(height: 8),
               Text(
                 'Preparándote una sorpresa...',
@@ -2216,7 +2212,6 @@ class _KamasutraPageState extends State<KamasutraPage>
                   fontSize: 14,
                   color: Colors.grey.shade600,
                 ),
-              ),
             ],
           ),
         ),
@@ -2237,35 +2232,37 @@ class _KamasutraPageState extends State<KamasutraPage>
             mainAxisSize: MainAxisSize.min,
             children: [
               // Position name
-              Text(
-                _currentPosition!.name,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
+              Flexible(
+                child: Text(
+                  _currentPosition!.name,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-              ),
               
               const SizedBox(height: 16),
               
               // Image placeholder (will show actual image if available)
-              Container(
-                width: 280,
-                height: 220,
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.red.shade200,
-                    width: 2,
+              Flexible(
+                child: Container(
+                  width: 250,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.red.shade200,
+                      width: 2,
+                    ),
                   ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: FutureBuilder(
+                    child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: FutureBuilder(
                     future: _checkImageExists(_currentPosition!.image),
                     builder: (context, snapshot) {
                       if (snapshot.data == true) {
@@ -2273,8 +2270,8 @@ class _KamasutraPageState extends State<KamasutraPage>
                         return Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: SizedBox(
-                            width: 220,
-                            height: 180,
+                            width: 200,
+                            height: 150,
                             child: SvgPicture.asset(
                               'assets/kamasutra/${_currentPosition!.image}',
                               fit: BoxFit.contain,
@@ -2289,28 +2286,28 @@ class _KamasutraPageState extends State<KamasutraPage>
                     },
                   ),
                 ),
-              ),
               
               const SizedBox(height: 16),
               
               // Description
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  _currentPosition!.description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 3,
+                  child: Text(
+                    _currentPosition!.description,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade700,
+                    ),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
+                  ),
                 ),
-              ),
             ],
           ),
         ),
