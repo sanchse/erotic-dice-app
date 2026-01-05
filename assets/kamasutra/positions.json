@@ -1,0 +1,100 @@
+{
+  "positions": [
+    {
+      "id": 1,
+      "name": "Misionero",
+      "image": "missionary.png",
+      "description": "Posición clásica cara a cara"
+    },
+    {
+      "id": 2,
+      "name": "Doggy Style",
+      "image": "doggy.png",
+      "description": "Posición desde atrás"
+    },
+    {
+      "id": 3,
+      "name": "Cowgirl",
+      "image": "cowgirl.png",
+      "description": "Ella arriba"
+    },
+    {
+      "id": 4,
+      "name": "Reverse Cowgirl",
+      "image": "reverse_cowgirl.png",
+      "description": "Ella arriba mirando hacia los pies"
+    },
+    {
+      "id": 5,
+      "name": "Spooning",
+      "image": "spooning.png",
+      "description": "De lado, ambos en la misma dirección"
+    },
+    {
+      "id": 6,
+      "name": "Standing",
+      "image": "standing.png",
+      "description": "De pie, ella apoyada"
+    },
+    // {
+    //   "id": 7,
+    //   "name": "Scissors",
+    //   "image": "scissors.png",
+    //   "description": "Entrecruzando las piernas"
+    // },
+    // {
+    //   "id": 8,
+    //   "name": "Lotus",
+    //   "image": "lotus.png",
+    //   "description": "Él sentado, ella encima mirándolo"
+    // },
+    // {
+    //   "id": 9,
+    //   "name": "Bridge",
+    //   "image": "bridge.png",
+    //   "description": "Ella en puente, él de rodillas"
+    // },
+    // {
+    //   "id": 10,
+    //   "name": "Wheelbarrow",
+    //   "image": "wheelbarrow.png",
+    //   "description": "Ella apoyada en brazos, él sujetando sus piernas"
+    // },
+    // {
+    //   "id": 11,
+    //   "name": "Butterfly",
+    //   "image": "butterfly.png",
+    //   "description": "Ella en el borde de la cama, él de pie"
+    // },
+    // {
+    //   "id": 12,
+    //   "name": "Amazon",
+    //   "image": "amazon.png",
+    //   "description": "Ella dominando completamente"
+    // },
+    // {
+    //   "id": 13,
+    //   "name": "Pretzel",
+    //   "image": "pretzel.png",
+    //   "description": "Posición retorcida de lado"
+    // },
+    // {
+    //   "id": 14,
+    //   "name": "Anvil",
+    //   "image": "anvil.png",
+    //   "description": "Ella con piernas muy elevadas"
+    // },
+    // {
+    //   "id": 15,
+    //   "name": "Slide",
+    //   "image": "slide.png",
+    //   "description": "Deslizándose hacia ella"
+    // },
+    // {
+    //   "id": 16,
+    //   "name": "Yawn",
+    //   "image": "yawn.png",
+    //   "description": "Ella estirándose hacia atrás"
+    // }
+  ]
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -19,7 +20,164 @@ class EroticDiceApp extends StatelessWidget {
         primarySwatch: Colors.pink,
         useMaterial3: true,
       ),
-      home: const DiceRollerPage(),
+      home: const MainMenuPage(), // Changed to show menu first
+    );
+  }
+}
+
+/// Main menu to choose between different dice types
+class MainMenuPage extends StatelessWidget {
+  const MainMenuPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Dados Eróticos'),
+        centerTitle: true,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.pink.shade50,
+              Colors.white,
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.casino,
+                size: 80,
+                color: Colors.pink,
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                '¡Elige tu tipo de dados!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.pink,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+              _buildMenuCard(
+                context,
+                title: 'Dados Tradicionales',
+                subtitle: 'Acciones, partes del cuerpo y tiempo',
+                icon: Icons.text_fields,
+                color: Colors.blue,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DiceRollerPage()),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+              _buildMenuCard(
+                context,
+                title: 'Dados Kamasutra',
+                subtitle: 'Posiciones con imágenes ilustrativas',
+                icon: Icons.image,
+                color: Colors.red,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const KamasutraPage()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 8,
+      shadowColor: color.withOpacity(0.3),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withOpacity(0.1),
+                color.withOpacity(0.05),
+              ],
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: color,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: color,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -1689,6 +1847,479 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
         },
         icon: const Icon(Icons.check),
         label: const Text('Aplicar Cambios'),
+      ),
+    );
+  }
+}
+
+/// Kamasutra position model
+class KamasutraPosition {
+  final int id;
+  final String name;
+  final String image;
+  final String description;
+
+  KamasutraPosition({
+    required this.id,
+    required this.name,
+    required this.image,
+    required this.description,
+  });
+
+  factory KamasutraPosition.fromJson(Map<String, dynamic> json) {
+    return KamasutraPosition(
+      id: json['id'],
+      name: json['name'],
+      image: json['image'],
+      description: json['description'],
+    );
+  }
+}
+
+/// Kamasutra dice page with image-based positions
+class KamasutraPage extends StatefulWidget {
+  const KamasutraPage({super.key});
+
+  @override
+  State<KamasutraPage> createState() => _KamasutraPageState();
+}
+
+class _KamasutraPageState extends State<KamasutraPage>
+    with TickerProviderStateMixin {
+  List<KamasutraPosition> _positions = [];
+  KamasutraPosition? _currentPosition;
+  bool _isLoading = false;
+  bool _isRolling = false;
+  
+  late AnimationController _diceAnimationController;
+  late AnimationController _resultAnimationController;
+  late Animation<double> _diceRotationAnimation;
+  late Animation<double> _diceScaleAnimation;
+  late Animation<double> _resultFadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeAnimations();
+    _loadPositions();
+  }
+
+  void _initializeAnimations() {
+    _diceAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    
+    _resultAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _diceRotationAnimation = Tween<double>(
+      begin: 0,
+      end: 4,
+    ).animate(CurvedAnimation(
+      parent: _diceAnimationController,
+      curve: Curves.easeInOut,
+    ));
+
+    _diceScaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.2,
+    ).animate(CurvedAnimation(
+      parent: _diceAnimationController,
+      curve: Curves.elasticOut,
+    ));
+
+    _resultFadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _resultAnimationController,
+      curve: Curves.easeIn,
+    ));
+  }
+
+  Future<void> _loadPositions() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Load positions from JSON file
+      final String jsonString = await rootBundle.loadString('assets/kamasutra/positions.json');
+      final Map<String, dynamic> jsonData = json.decode(jsonString);
+      final List<dynamic> positionsJson = jsonData['positions'];
+      
+      _positions = positionsJson
+          .map((json) => KamasutraPosition.fromJson(json))
+          .toList();
+          
+      debugPrint('Loaded ${_positions.length} Kamasutra positions');
+    } catch (e) {
+      debugPrint('Error loading positions from JSON: $e');
+      // Fallback to hardcoded positions if JSON loading fails
+      _positions = [
+        KamasutraPosition(id: 1, name: "Misionero", image: "missionary.png", description: "Posición clásica cara a cara"),
+        KamasutraPosition(id: 2, name: "Doggy Style", image: "doggy.png", description: "Posición desde atrás"),
+        KamasutraPosition(id: 3, name: "Cowgirl", image: "cowgirl.png", description: "Ella arriba"),
+        KamasutraPosition(id: 4, name: "Reverse Cowgirl", image: "reverse_cowgirl.png", description: "Ella arriba mirando hacia los pies"),
+        KamasutraPosition(id: 5, name: "Spooning", image: "spooning.png", description: "De lado, ambos en la misma dirección"),
+        KamasutraPosition(id: 6, name: "Standing", image: "standing.png", description: "De pie, ella apoyada"),
+      ];
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _rollDice() async {
+    if (_positions.isEmpty) return;
+
+    setState(() {
+      _isRolling = true;
+      _currentPosition = null;
+    });
+
+    _diceAnimationController.reset();
+    _diceAnimationController.forward();
+
+    await Future.delayed(const Duration(milliseconds: 2000));
+
+    final random = Random();
+    final selectedPosition = _positions[random.nextInt(_positions.length)];
+
+    setState(() {
+      _currentPosition = selectedPosition;
+      _isRolling = false;
+    });
+
+    _resultAnimationController.reset();
+    _resultAnimationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _diceAnimationController.dispose();
+    _resultAnimationController.dispose();
+    super.dispose();
+  }
+
+  Future<bool> _checkImageExists(String imageName) async {
+    try {
+      await rootBundle.load('assets/kamasutra/$imageName');
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Widget _buildImagePlaceholder() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.image,
+          size: 80,
+          color: Colors.red.shade300,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Imagen de la posición\n${_currentPosition!.name}',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.red.shade400,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Dados Kamasutra'),
+        centerTitle: true,
+        backgroundColor: Colors.red.shade400,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.red.shade50,
+              Colors.white,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // Header
+                Card(
+                  elevation: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        const Icon(
+                          Icons.favorite,
+                          size: 48,
+                          color: Colors.red,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Dados Kamasutra',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Descubre nuevas posiciones con cada lanzamiento',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 20),
+                
+                // Dice area
+                Expanded(
+                  child: _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _isRolling
+                          ? _buildRollingAnimation()
+                          : _currentPosition != null
+                              ? _buildResult()
+                              : _buildInitialState(),
+                ),
+                
+                // Roll button
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ElevatedButton.icon(
+                    onPressed: _isRolling ? null : _rollDice,
+                    icon: _isRolling
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Icon(Icons.casino),
+                    label: Text(_isRolling ? 'Lanzando...' : '¡Lanzar Dado!'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade400,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
+                      ),
+                      textStyle: const TextStyle(fontSize: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInitialState() {
+    return Center(
+      child: Card(
+        elevation: 4,
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.touch_app,
+                size: 64,
+                color: Colors.red.shade300,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '¡Lanza el dado para descubrir\nuna nueva posición!',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey.shade600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRollingAnimation() {
+    return Center(
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: const EdgeInsets.all(32.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedBuilder(
+                animation: _diceAnimationController,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: _diceScaleAnimation.value,
+                    child: Transform.rotate(
+                      angle: _diceRotationAnimation.value * 2 * 3.14159,
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade100,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.red.shade400,
+                            width: 3,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.favorite,
+                          size: 60,
+                          color: Colors.red.shade400,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                '¡Descubriendo tu posición!',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Preparándote una sorpresa...',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResult() {
+    if (_currentPosition == null) return const SizedBox();
+
+    return FadeTransition(
+      opacity: _resultFadeAnimation,
+      child: Card(
+        elevation: 8,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Position name
+              Text(
+                _currentPosition!.name,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Image placeholder (will show actual image if available)
+              Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.red.shade200,
+                    width: 2,
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: FutureBuilder(
+                    future: _checkImageExists(_currentPosition!.image),
+                    builder: (context, snapshot) {
+                      if (snapshot.data == true) {
+                        // Show actual image if it exists
+                        return Image.asset(
+                          'assets/kamasutra/${_currentPosition!.image}',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return _buildImagePlaceholder();
+                          },
+                        );
+                      } else {
+                        // Show placeholder
+                        return _buildImagePlaceholder();
+                      }
+                    },
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Description
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  _currentPosition!.description,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey.shade700,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
