@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -1960,12 +1961,12 @@ class _KamasutraPageState extends State<KamasutraPage>
       debugPrint('Error loading positions from JSON: $e');
       // Fallback to hardcoded positions if JSON loading fails
       _positions = [
-        KamasutraPosition(id: 1, name: "Misionero", image: "missionary.png", description: "Posición clásica cara a cara"),
-        KamasutraPosition(id: 2, name: "Doggy Style", image: "doggy.png", description: "Posición desde atrás"),
-        KamasutraPosition(id: 3, name: "Cowgirl", image: "cowgirl.png", description: "Ella arriba"),
-        KamasutraPosition(id: 4, name: "Reverse Cowgirl", image: "reverse_cowgirl.png", description: "Ella arriba mirando hacia los pies"),
-        KamasutraPosition(id: 5, name: "Spooning", image: "spooning.png", description: "De lado, ambos en la misma dirección"),
-        KamasutraPosition(id: 6, name: "Standing", image: "standing.png", description: "De pie, ella apoyada"),
+        KamasutraPosition(id: 1, name: "Misionero", image: "missionary.svg", description: "Posición clásica cara a cara"),
+        KamasutraPosition(id: 2, name: "Doggy Style", image: "doggy.svg", description: "Posición desde atrás"),
+        KamasutraPosition(id: 3, name: "Cowgirl", image: "cowgirl.svg", description: "Ella arriba"),
+        KamasutraPosition(id: 4, name: "Reverse Cowgirl", image: "reverse_cowgirl.svg", description: "Ella arriba mirando hacia los pies"),
+        KamasutraPosition(id: 5, name: "Spooning", image: "spooning.svg", description: "De lado, ambos en la misma dirección"),
+        KamasutraPosition(id: 6, name: "Standing", image: "standing.svg", description: "De pie, ella apoyada"),
       ];
     }
 
@@ -2016,24 +2017,35 @@ class _KamasutraPageState extends State<KamasutraPage>
   }
 
   Widget _buildImagePlaceholder() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          Icons.image,
-          size: 80,
-          color: Colors.red.shade300,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Imagen de la posición\n${_currentPosition!.name}',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.red.shade400,
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SizedBox(
+        width: 268,
+        height: 268,
+        child: SvgPicture.asset(
+          'assets/kamasutra/default.svg',
+          fit: BoxFit.contain,
+          placeholderBuilder: (context) => Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.image,
+                size: 80,
+                color: Colors.red.shade300,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Imagen no disponible',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.red.shade400,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-          textAlign: TextAlign.center,
         ),
-      ],
+      ),
     );
   }
 
@@ -2266,8 +2278,8 @@ class _KamasutraPageState extends State<KamasutraPage>
               
               // Image placeholder (will show actual image if available)
               Container(
-                width: 200,
-                height: 200,
+                width: 300,
+                height: 300,
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
                   borderRadius: BorderRadius.circular(16),
@@ -2282,13 +2294,18 @@ class _KamasutraPageState extends State<KamasutraPage>
                     future: _checkImageExists(_currentPosition!.image),
                     builder: (context, snapshot) {
                       if (snapshot.data == true) {
-                        // Show actual image if it exists
-                        return Image.asset(
-                          'assets/kamasutra/${_currentPosition!.image}',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return _buildImagePlaceholder();
-                          },
+                        // Show actual SVG image if it exists
+                        return Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: SizedBox(
+                            width: 268,
+                            height: 268,
+                            child: SvgPicture.asset(
+                              'assets/kamasutra/${_currentPosition!.image}',
+                              fit: BoxFit.contain,
+                              placeholderBuilder: (context) => _buildImagePlaceholder(),
+                            ),
+                          ),
                         );
                       } else {
                         // Show placeholder

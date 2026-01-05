@@ -3,98 +3,85 @@
     {
       "id": 1,
       "name": "Misionero",
-      "image": "missionary.png",
+      "image": "missionary.svg",
       "description": "Posición clásica cara a cara"
     },
     {
       "id": 2,
       "name": "Doggy Style",
-      "image": "doggy.png",
+      "image": "doggy.svg",
       "description": "Posición desde atrás"
     },
     {
       "id": 3,
       "name": "Cowgirl",
-      "image": "cowgirl.png",
+      "image": "cowgirl.svg",
       "description": "Ella arriba"
     },
     {
       "id": 4,
       "name": "Reverse Cowgirl",
-      "image": "reverse_cowgirl.png",
+      "image": "reverse_cowgirl.svg",
       "description": "Ella arriba mirando hacia los pies"
     },
     {
       "id": 5,
-      "name": "Spooning",
-      "image": "spooning.png",
-      "description": "De lado, ambos en la misma dirección"
+      "name": "Stand and Carry",
+      "image": "stand_and_carry.svg",
+      "description": "Él de pie sosteniéndola"
     },
     {
       "id": 6,
-      "name": "Standing",
-      "image": "standing.png",
-      "description": "De pie, ella apoyada"
+      "name": "Bodyguard",
+      "image": "bodyguard.svg",
+      "description": "Él detrás abrazándola"
     },
-    // {
-    //   "id": 7,
-    //   "name": "Scissors",
-    //   "image": "scissors.png",
-    //   "description": "Entrecruzando las piernas"
-    // },
-    // {
-    //   "id": 8,
-    //   "name": "Lotus",
-    //   "image": "lotus.png",
-    //   "description": "Él sentado, ella encima mirándolo"
-    // },
-    // {
-    //   "id": 9,
-    //   "name": "Bridge",
-    //   "image": "bridge.png",
-    //   "description": "Ella en puente, él de rodillas"
-    // },
-    // {
-    //   "id": 10,
-    //   "name": "Wheelbarrow",
-    //   "image": "wheelbarrow.png",
-    //   "description": "Ella apoyada en brazos, él sujetando sus piernas"
-    // },
-    // {
-    //   "id": 11,
-    //   "name": "Butterfly",
-    //   "image": "butterfly.png",
-    //   "description": "Ella en el borde de la cama, él de pie"
-    // },
-    // {
-    //   "id": 12,
-    //   "name": "Amazon",
-    //   "image": "amazon.png",
-    //   "description": "Ella dominando completamente"
-    // },
-    // {
-    //   "id": 13,
-    //   "name": "Pretzel",
-    //   "image": "pretzel.png",
-    //   "description": "Posición retorcida de lado"
-    // },
-    // {
-    //   "id": 14,
-    //   "name": "Anvil",
-    //   "image": "anvil.png",
-    //   "description": "Ella con piernas muy elevadas"
-    // },
-    // {
-    //   "id": 15,
-    //   "name": "Slide",
-    //   "image": "slide.png",
-    //   "description": "Deslizándose hacia ella"
-    // },
-    // {
-    //   "id": 16,
-    //   "name": "Yawn",
-    //   "image": "yawn.png",
-    //   "description": "Ella estirándose hacia atrás"
-    // }
+    {
+        "id": 7,
+        "name": "69",
+        "image": "69.svg",
+        "description": "Ambos disfrutando oralmente"
+    },
+    {
+        "id": 8,
+        "name": "Kneeling Blow Job",
+        "image": "kneeling_blow_job.svg",
+        "description": "Él de pie, ella arrodillada frente a él realizando sexo oral"
+    },
+    {
+        "id": 9,
+        "name": "Prone",
+        "image": "prone.svg",  
+        "description": "Ella boca abajo, él encima"
+    },
+    {
+        "id": 10,
+        "name": "Anvil",
+        "image": "anvil.svg",
+        "description": "Ella con piernas muy elevadas, él encima"
+    },
+    {
+        "id": 11,
+        "name": "Zeus",
+        "image": "zeus.svg",
+        "description": "Ella de rodilla realizando sexo oral mientras él está de pie sujetando la cabeza"
+    },
+    {
+        "id": 12,
+        "name": "Hungry",
+        "image": "hungry.svg",
+        "description": "Ella tumbada y él entre sus piernas realizando sexo oral"
+    },
+    {
+        "id": 13,
+        "name": "Dancer",
+        "image": "dancer.svg",
+        "description": "Él de pie, ella de pie frente a él con una pierna elevada alrededor de su cintura"
+    }, {
+        "id": 14,
+        "name": "Bow and Arrow",
+        "image": "bow_and_arrow.svg",
+        "description": "Él boca arriba, ella encima con una pierna entre sus piernas y la otra extendida"
+    }
   ]
 }
