@@ -73,7 +73,7 @@ class MainMenuPage extends StatelessWidget {
                 context,
                 title: 'Dados Tradicionales',
                 subtitle: 'Acciones, partes del cuerpo y tiempo',
-                icon: Icons.text_fields,
+                imagePath: 'assets/kamasutra/default.svg',
                 color: Colors.blue,
                 onTap: () {
                   Navigator.push(
@@ -87,7 +87,7 @@ class MainMenuPage extends StatelessWidget {
                 context,
                 title: 'Dados Kamasutra',
                 subtitle: 'Posiciones con imágenes ilustrativas',
-                icon: Icons.image,
+                imagePath: 'assets/kamasutra/logo.svg',
                 color: Colors.red,
                 onTap: () {
                   Navigator.push(
@@ -107,7 +107,7 @@ class MainMenuPage extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String subtitle,
-    required IconData icon,
+    required String imagePath,
     required Color color,
     required VoidCallback onTap,
   }) {
@@ -141,10 +141,11 @@ class MainMenuPage extends StatelessWidget {
                   color: color.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  icon,
-                  size: 32,
-                  color: color,
+                child: SvgPicture.asset(
+                  imagePath,
+                  width: 32,
+                  height: 32,
+                  colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
                 ),
               ),
               const SizedBox(width: 16),
