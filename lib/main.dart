@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(const EroticDiceApp());
@@ -459,6 +460,9 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   // Loading state for initialization
   bool _isLoading = true;
   
+  // Audio player for sound effects
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  
   // Animation state and controllers
   bool _isRolling = false;
   late AnimationController _diceAnimationController;
@@ -514,6 +518,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   void dispose() {
     _diceAnimationController.dispose();
     _resultAnimationController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -632,6 +637,19 @@ class _DiceRollerPageState extends State<DiceRollerPage>
       _isRolling = true;
       _rollResults = null;
     });
+    
+    // Play dice roll sound or vibrate as fallback
+    try {
+      await _audioPlayer.play(AssetSource('sounds/dice_roll.mp3'));
+    } catch (e) {
+      debugPrint('Error playing dice roll sound: $e');
+      // Use haptic feedback as fallback
+      try {
+        await HapticFeedback.mediumImpact();
+      } catch (hapticError) {
+        debugPrint('Error with haptic feedback: $hapticError');
+      }
+    }
     
     // Start dice animation
     _diceAnimationController.reset();
