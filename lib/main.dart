@@ -50,11 +50,12 @@ class MainMenuPage extends StatelessWidget {
             ],
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
               const Icon(
                 Icons.casino,
                 size: 80,
@@ -101,6 +102,7 @@ class MainMenuPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -2506,7 +2508,7 @@ class _KamasutraPageState extends State<KamasutraPage>
                 Card(
                   elevation: 4,
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(12.0),
                     child: Column(
                       children: [
                         const Icon(

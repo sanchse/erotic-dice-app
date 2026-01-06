@@ -4,35 +4,35 @@
       "id": 1,
       "name": "Misionero",
       "image": "missionary.svg",
-      "description": "Posición clásica cara a cara"
+      "description": "Posición clásica cara a cara, él encima"
     },
     {
       "id": 2,
-      "name": "Doggy Style",
+      "name": "Perrito",
       "image": "doggy.svg",
       "description": "Posición desde atrás"
     },
     {
       "id": 3,
-      "name": "Cowgirl",
+      "name": "Vaquera",
       "image": "cowgirl.svg",
       "description": "Ella arriba"
     },
     {
       "id": 4,
-      "name": "Reverse Cowgirl",
+      "name": "Vaquera Invertida",
       "image": "reverse_cowgirl.svg",
       "description": "Ella arriba mirando hacia los pies"
     },
     {
       "id": 5,
-      "name": "Stand and Carry",
+      "name": "De pie y cargando",
       "image": "stand_and_carry.svg",
       "description": "Él de pie sosteniéndola"
     },
     {
       "id": 6,
-      "name": "Bodyguard",
+      "name": "Guardaespaldas",
       "image": "bodyguard.svg",
       "description": "Él detrás abrazándola"
     },
@@ -68,20 +68,21 @@
     },
     {
         "id": 12,
-        "name": "Hungry",
+        "name": "Hambriento",
         "image": "hungry.svg",
         "description": "Ella tumbada y él entre sus piernas realizando sexo oral"
     },
     {
         "id": 13,
-        "name": "Dancer",
+        "name": "Bailarines",
         "image": "dancer.svg",
         "description": "Él de pie, ella de pie frente a él con una pierna elevada alrededor de su cintura"
-    }, {
+    }, 
+    {
         "id": 14,
-        "name": "Bow and Arrow",
-        "image": "bow_and_arrow.svg",
-        "description": "Él boca arriba, ella encima con una pierna entre sus piernas y la otra extendida"
+        "name": "Man missionary",
+        "image": "man_missionary.svg",
+        "description": "Ambos acostados de lado, él detrás de ella"
     }
   ]
 }
