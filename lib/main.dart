@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:math';
+import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
@@ -470,6 +471,17 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   late Animation<double> _diceRotationAnimation;
   late Animation<double> _diceScaleAnimation;
   late Animation<double> _resultFadeAnimation;
+  
+  // Countdown timer functionality
+  Timer? _countdownTimer;
+  int _countdownSeconds = 0;
+  int _detectedSeconds = 0; // Tiempo detectado antes de iniciar
+  String _detectedTimeText = ''; // Texto original del tiempo detectado
+  bool _showCountdown = false;
+  bool _isCountdownActive = false;
+  bool _isCountdownPaused = false; // Control de pausa
+  bool _showCountdownPending = false; // Mostrar tiempo detectado sin iniciar
+  TextEditingController _customTimeController = TextEditingController();
 
   @override
   void initState() {
@@ -519,6 +531,8 @@ class _DiceRollerPageState extends State<DiceRollerPage>
     _diceAnimationController.dispose();
     _resultAnimationController.dispose();
     _audioPlayer.dispose();
+    _countdownTimer?.cancel();
+    _customTimeController.dispose();
     super.dispose();
   }
 
@@ -617,7 +631,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
       ),
       Dice(
         title: 'Tiempo',
-        options: ['5 segundos', '10 segundos', '30 segundos', '1 minuto', '2 minutos'],
+        options: ['30 seg', '1 min', '2 min', '3 min', '5 min', '?'],
       ),
     ];
     _rollResults = null;
@@ -669,9 +683,222 @@ class _DiceRollerPageState extends State<DiceRollerPage>
       _isRolling = false;
     });
     
+    // Check if there's a time dice and configure countdown
+    _checkAndConfigureCountdown(results);
+    
     // Animate results appearance
     _resultAnimationController.reset();
     _resultAnimationController.forward();
+  }
+
+  /// Check if there's a time dice and configure countdown
+  void _checkAndConfigureCountdown(List<String> results) {
+    // Only check for countdown if we have 3 dice (traditional dice setup)
+    if (results.length != 3) return;
+    
+    // Check if the third dice contains time values
+    final timeDiceResult = results[2];
+    _parseAndSetCountdown(timeDiceResult);
+  }
+
+  /// Parse time value and prepare countdown (don't start automatically)
+  void _parseAndSetCountdown(String timeValue) {
+    int? seconds;
+    
+    // Try to parse time in different formats
+    if (timeValue == "?") {
+      // Show dialog to input custom time
+      _showCustomTimeDialog();
+      return;
+    }
+    
+    // Try to parse "X min" format
+    final minMatch = RegExp(r'(\d+)\s*min', caseSensitive: false).firstMatch(timeValue);
+    if (minMatch != null) {
+      final minutes = int.tryParse(minMatch.group(1) ?? '');
+      if (minutes != null) {
+        seconds = minutes * 60;
+      }
+    }
+    
+    // Try to parse "X seg" format
+    final secMatch = RegExp(r'(\d+)\s*seg', caseSensitive: false).firstMatch(timeValue);
+    if (secMatch != null) {
+      seconds = int.tryParse(secMatch.group(1) ?? '');
+    }
+    
+    // Try to parse plain number (assume minutes)
+    if (seconds == null) {
+      final number = int.tryParse(timeValue);
+      if (number != null && number > 0 && number <= 60) {
+        seconds = number * 60; // Convert to seconds
+      }
+    }
+    
+    if (seconds != null && seconds > 0) {
+      // Don't start countdown automatically, just show the detected time
+      setState(() {
+        _detectedSeconds = seconds!;
+        _detectedTimeText = timeValue;
+        _showCountdownPending = true;
+        _showCountdown = false;
+      });
+    }
+  }
+
+  /// Start countdown with specified seconds
+  void _startCountdown(int seconds) {
+    _stopCountdown(); // Stop any existing countdown
+    
+    setState(() {
+      _countdownSeconds = seconds;
+      _showCountdown = true;
+      _isCountdownActive = true;
+    });
+    
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _countdownSeconds--;
+      });
+      
+      // Play countdown sound 3 seconds before finish (when audio starts)
+      if (_countdownSeconds == 3) {
+        _playCountdownFinishedSound();
+      }
+      
+      // Countdown finished
+      if (_countdownSeconds <= 0) {
+        _stopCountdown();
+        _showCountdownFinishedDialog();
+      }
+    });
+  }
+
+  /// Stop the countdown completely
+  void _stopCountdown() {
+    _countdownTimer?.cancel();
+    _countdownTimer = null;
+    setState(() {
+      _isCountdownActive = false;
+      _isCountdownPaused = false;
+    });
+  }
+
+  /// Pause the countdown
+  void _pauseCountdown() {
+    _countdownTimer?.cancel();
+    _countdownTimer = null;
+    setState(() {
+      _isCountdownPaused = true;
+    });
+  }
+
+  /// Resume the countdown
+  void _resumeCountdown() {
+    setState(() {
+      _isCountdownPaused = false;
+    });
+    
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _countdownSeconds--;
+      });
+      
+      // Play countdown sound 3 seconds before finish (when audio starts)
+      if (_countdownSeconds == 3) {
+        _playCountdownFinishedSound();
+      }
+      
+      // Countdown finished
+      if (_countdownSeconds <= 0) {
+        _stopCountdown();
+        _showCountdownFinishedDialog();
+      }
+    });
+  }
+
+  /// Play sound when countdown finishes
+  void _playCountdownFinishedSound() async {
+    try {
+      await _audioPlayer.play(AssetSource('sounds/countdown.mp3'));
+    } catch (e) {
+      debugPrint('Error playing countdown finished sound: $e');
+      try {
+        await HapticFeedback.heavyImpact();
+      } catch (hapticError) {
+        debugPrint('Error with haptic feedback: $hapticError');
+      }
+    }
+  }
+
+  /// Show dialog for custom time input
+  void _showCustomTimeDialog() async {
+    _customTimeController.clear();
+    
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Tiempo Personalizado'),
+          content: TextField(
+            controller: _customTimeController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Segundos',
+              hintText: 'Ingresa el tiempo en segundos',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Confirmar'),
+              onPressed: () {
+                final seconds = int.tryParse(_customTimeController.text);
+                if (seconds != null && seconds > 0) {
+                  setState(() {
+                    _detectedSeconds = seconds;
+                    _detectedTimeText = '$seconds seg';
+                    _showCountdownPending = true;
+                    _showCountdown = false;
+                  });
+                }
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Show dialog when countdown finishes
+  void _showCountdownFinishedDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('¡Tiempo Terminado!'),
+          content: const Text('El contador regresivo ha llegado a cero.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  _showCountdown = false;
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   /// Update the title of a specific dice
@@ -1367,11 +1594,221 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                   ),
               ],
             ),
+            // Countdown timer display
+            if (_showCountdown) _buildCountdownWidget(),
+            // Show detected time before starting countdown
+            if (_showCountdownPending) _buildCountdownPendingWidget(),
           ],
         ),
       ),
     );
   }
+
+  /// Build countdown timer widget
+  Widget _buildCountdownWidget() {
+    final minutes = _countdownSeconds ~/ 60;
+    final seconds = _countdownSeconds % 60;
+    final timeString = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    
+    return Container(
+      margin: const EdgeInsets.only(top: 20),
+      child: Card(
+        elevation: 2,
+        color: _isCountdownPaused 
+            ? Colors.orange.shade50 
+            : (_countdownSeconds <= 10 ? Colors.red.shade50 : Colors.blue.shade50),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    _isCountdownPaused ? Icons.pause_circle_outline : Icons.timer,
+                    color: _isCountdownPaused 
+                        ? Colors.orange 
+                        : (_countdownSeconds <= 10 ? Colors.red : Colors.blue),
+                    size: 24,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _isCountdownPaused ? 'Contador Pausado' : 'Contador Regresivo',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: _isCountdownPaused 
+                          ? Colors.orange 
+                          : (_countdownSeconds <= 10 ? Colors.red : Colors.blue),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                timeString,
+                style: TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: _isCountdownPaused 
+                      ? Colors.orange 
+                      : (_countdownSeconds <= 10 ? Colors.red : Colors.blue),
+                  fontFamily: 'monospace',
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (_isCountdownActive && !_isCountdownPaused)
+                    ElevatedButton.icon(
+                      onPressed: _pauseCountdown,
+                      icon: const Icon(Icons.pause),
+                      label: const Text('Pausar'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  if (_isCountdownPaused)
+                    ElevatedButton.icon(
+                      onPressed: _resumeCountdown,
+                      icon: const Icon(Icons.play_arrow),
+                      label: const Text('Reanudar'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      _stopCountdown();
+                      setState(() {
+                        _showCountdown = false;
+                      });
+                    },
+                    icon: const Icon(Icons.close),
+                    label: const Text('Cerrar'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build countdown pending widget (before starting)
+  Widget _buildCountdownPendingWidget() {
+    final minutes = _detectedSeconds ~/ 60;
+    final seconds = _detectedSeconds % 60;
+    final timeString = minutes > 0 
+        ? (seconds > 0 ? '${minutes}m ${seconds}s' : '${minutes} min')
+        : '${seconds} seg';
+    
+    return Container(
+      margin: const EdgeInsets.only(top: 20),
+      child: Card(
+        elevation: 2,
+        color: Colors.green.shade50,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.timer_outlined,
+                    color: Colors.green,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Tiempo Detectado',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Resultado: $_detectedTimeText',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                timeString,
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                  fontFamily: 'monospace',
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                '¿Listo para comenzar el contador?',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[700],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        _showCountdownPending = false;
+                      });
+                    },
+                    icon: const Icon(Icons.close),
+                    label: const Text('Cancelar'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: _confirmAndStartCountdown,
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('Iniciar'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Confirm and start countdown
+  void _confirmAndStartCountdown() {
+    setState(() {
+      _showCountdownPending = false;
+    });
+    _startCountdown(_detectedSeconds);
+  }
+
 }
 
 /// Configuration page for managing dice settings
