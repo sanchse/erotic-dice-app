@@ -2689,7 +2689,7 @@ class _KamasutraPageState extends State<KamasutraPage>
       child: Card(
         elevation: 8,
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(2.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -2697,21 +2697,19 @@ class _KamasutraPageState extends State<KamasutraPage>
               Text(
                 _currentPosition!.name,
                 style: const TextStyle(
-                  fontSize: 8,
+                  fontSize: 3,
                   fontWeight: FontWeight.bold,
                   color: Colors.red,
                 ),
                 textAlign: TextAlign.center,
                 overflow: TextOverflow.ellipsis,
-                maxLines: 2,
+                maxLines: 1,
               ),
-              
-              const SizedBox(height: 16),
               
               // Image placeholder (will show actual image if available)
               Container(
-                width: 100,
-                height: 70,
+                width: 40,
+                height: 26,
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
                   borderRadius: BorderRadius.circular(16),
@@ -2727,16 +2725,13 @@ class _KamasutraPageState extends State<KamasutraPage>
                     builder: (context, snapshot) {
                       if (snapshot.data == true) {
                         // Show actual SVG image if it exists
-                        return Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: SizedBox(
-                            width: 220,
-                            height: 180,
-                            child: SvgPicture.asset(
-                              'assets/kamasutra/${_currentPosition!.image}',
-                              fit: BoxFit.contain,
-                              placeholderBuilder: (context) => _buildImagePlaceholder(),
-                            ),
+                        return SizedBox(
+                          width: 40,
+                          height: 26,
+                          child: SvgPicture.asset(
+                            'assets/kamasutra/${_currentPosition!.image}',
+                            fit: BoxFit.contain,
+                            placeholderBuilder: (context) => _buildImagePlaceholder(),
                           ),
                         );
                       } else {
