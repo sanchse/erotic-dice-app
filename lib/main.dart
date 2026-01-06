@@ -165,7 +165,7 @@ class MainMenuPage extends StatelessWidget {
                         color: color,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       subtitle,
                       style: TextStyle(
@@ -2595,20 +2595,20 @@ class _KamasutraPageState extends State<KamasutraPage>
       child: Card(
         elevation: 4,
         child: Padding(
-          padding: const EdgeInsets.all(32.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.touch_app,
-                size: 64,
+                size: 24,
                 color: Colors.red.shade300,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 2),
               Text(
                 '¡Lanza el dado para descubrir\nuna nueva posición!',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 12,
                   color: Colors.grey.shade600,
                 ),
                 textAlign: TextAlign.center,
@@ -2625,7 +2625,7 @@ class _KamasutraPageState extends State<KamasutraPage>
       child: Card(
         elevation: 8,
         child: Padding(
-          padding: const EdgeInsets.all(32.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -2637,8 +2637,8 @@ class _KamasutraPageState extends State<KamasutraPage>
                     child: Transform.rotate(
                       angle: _diceRotationAnimation.value * 2 * 3.14159,
                       child: Container(
-                        width: 120,
-                        height: 120,
+                        width: 35,
+                        height: 35,
                         decoration: BoxDecoration(
                           color: Colors.red.shade100,
                           borderRadius: BorderRadius.circular(16),
@@ -2649,7 +2649,7 @@ class _KamasutraPageState extends State<KamasutraPage>
                         ),
                         child: Icon(
                           Icons.favorite,
-                          size: 60,
+                          size: 18,
                           color: Colors.red.shade400,
                         ),
                       ),
@@ -2657,11 +2657,11 @@ class _KamasutraPageState extends State<KamasutraPage>
                   );
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 2),
               const Text(
                 '¡Descubriendo tu posición!',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 9,
                   fontWeight: FontWeight.bold,
                   color: Colors.red,
                 ),
@@ -2670,7 +2670,7 @@ class _KamasutraPageState extends State<KamasutraPage>
               Text(
                 'Preparándote una sorpresa...',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 9,
                   color: Colors.grey.shade600,
                 ),
               ),
@@ -2689,7 +2689,7 @@ class _KamasutraPageState extends State<KamasutraPage>
       child: Card(
         elevation: 8,
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(12.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -2697,7 +2697,7 @@ class _KamasutraPageState extends State<KamasutraPage>
               Text(
                 _currentPosition!.name,
                 style: const TextStyle(
-                  fontSize: 22,
+                  fontSize: 8,
                   fontWeight: FontWeight.bold,
                   color: Colors.red,
                 ),
@@ -2710,8 +2710,8 @@ class _KamasutraPageState extends State<KamasutraPage>
               
               // Image placeholder (will show actual image if available)
               Container(
-                width: 280,
-                height: 220,
+                width: 100,
+                height: 70,
                 decoration: BoxDecoration(
                   color: Colors.red.shade50,
                   borderRadius: BorderRadius.circular(16),
