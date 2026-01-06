@@ -2686,84 +2686,95 @@ class _KamasutraPageState extends State<KamasutraPage>
 
     return FadeTransition(
       opacity: _resultFadeAnimation,
-      child: Card(
-        elevation: 8,
-        child: Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Position name
-              Text(
-                _currentPosition!.name,
-                style: const TextStyle(
-                  fontSize: 3,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              
-              // Image placeholder (will show actual image if available)
-              Container(
-                width: 40,
-                height: 26,
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.red.shade200,
-                    width: 2,
+      child: Center(
+        child: SingleChildScrollView(
+          child: Card(
+            elevation: 8,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Position name
+                  Text(
+                    _currentPosition!.name,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: FutureBuilder(
-                    future: _checkImageExists(_currentPosition!.image),
-                    builder: (context, snapshot) {
-                      if (snapshot.data == true) {
-                        // Show actual SVG image if it exists
-                        return SizedBox(
-                          width: 40,
-                          height: 26,
-                          child: SvgPicture.asset(
-                            'assets/kamasutra/${_currentPosition!.image}',
-                            fit: BoxFit.contain,
-                            placeholderBuilder: (context) => _buildImagePlaceholder(),
-                          ),
-                        );
-                      } else {
-                        // Show placeholder
-                        return _buildImagePlaceholder();
-                      }
-                    },
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Image placeholder (will show actual image if available)
+                  Container(
+                    width: 200,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.red.shade200,
+                        width: 2,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: FutureBuilder(
+                        future: _checkImageExists(_currentPosition!.image),
+                        builder: (context, snapshot) {
+                          if (snapshot.data == true) {
+                            // Show actual SVG image if it exists
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SizedBox(
+                                width: 200,
+                                height: 150,
+                                child: SvgPicture.asset(
+                                  'assets/kamasutra/${_currentPosition!.image}',
+                                  fit: BoxFit.contain,
+                                  placeholderBuilder: (context) => _buildImagePlaceholder(),
+                                ),
+                              ),
+                            );
+                          } else {
+                            // Show placeholder
+                            return _buildImagePlaceholder();
+                          }
+                        },
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Description
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  _currentPosition!.description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Description
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      _currentPosition!.description,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade700,
+                      ),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 3,
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
