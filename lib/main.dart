@@ -2733,14 +2733,10 @@ class _KamasutraPageState extends State<KamasutraPage>
                             // Show actual SVG image if it exists
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: SizedBox(
-                                width: 200,
-                                height: 150,
-                                child: SvgPicture.asset(
-                                  'assets/kamasutra/${_currentPosition!.image}',
-                                  fit: BoxFit.contain,
-                                  placeholderBuilder: (context) => _buildImagePlaceholder(),
-                                ),
+                              child: SvgPicture.asset(
+                                'assets/kamasutra/${_currentPosition!.image}',
+                                fit: BoxFit.contain,
+                                placeholderBuilder: (context) => _buildImagePlaceholder(),
                               ),
                             );
                           } else {
