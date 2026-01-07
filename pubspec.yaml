@@ -33,6 +33,9 @@ flutter_native_splash:
   android: true
   ios: false
   web: true
+  fullscreen: true
+  android_gravity: fill
+  web_image_mode: cover
 
 flutter:
   uses-material-design: true
