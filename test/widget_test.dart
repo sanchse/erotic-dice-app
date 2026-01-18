@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:erotic_dice_app/main.dart';
+import 'package:erotic_dice_app/models/dice.dart';
 
 void main() {
   group('Dice Model Tests', () {
