@@ -33,9 +33,10 @@ flutter_native_splash:
   android: true
   ios: false
   web: true
-  fullscreen: true
-  android_gravity: fill
-  web_image_mode: cover
+  android_12:
+    image: assets/launch.png
+    color: "#FFFFFF"
+    icon_background_color: "#FFFFFF"
 
 flutter:
   uses-material-design: true
