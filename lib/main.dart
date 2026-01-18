@@ -705,7 +705,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
 
   /// Parse time value and prepare countdown (don't start automatically)
   void _parseAndSetCountdown(String timeValue) {
-    int? seconds;
+    int seconds = 0;
     
     // Try to parse time in different formats
     if (timeValue == "?") {
@@ -714,33 +714,42 @@ class _DiceRollerPageState extends State<DiceRollerPage>
       return;
     }
     
-    // Try to parse "X min" format
-    final minMatch = RegExp(r'(\d+)\s*min', caseSensitive: false).firstMatch(timeValue);
-    if (minMatch != null) {
-      final minutes = int.tryParse(minMatch.group(1) ?? '');
-      if (minutes != null) {
+    // Try to parse "X minuto(s) y Y segundo(s)" format or "X min Y seg" format
+    final combinedMatch = RegExp(
+      r'(\d+)\s*(?:minuto|min)(?:s)?\s*(?:y)?\s*(\d+)\s*(?:segundo|seg)(?:s)?',
+      caseSensitive: false
+    ).firstMatch(timeValue);
+    
+    if (combinedMatch != null) {
+      final minutes = int.tryParse(combinedMatch.group(1) ?? '0') ?? 0;
+      final secs = int.tryParse(combinedMatch.group(2) ?? '0') ?? 0;
+      seconds = (minutes * 60) + secs;
+    } else {
+      // Try to parse "X min" or "X minuto(s)" format
+      final minMatch = RegExp(r'(\d+)\s*(?:minuto|min)(?:s)?', caseSensitive: false).firstMatch(timeValue);
+      if (minMatch != null) {
+        final minutes = int.tryParse(minMatch.group(1) ?? '0') ?? 0;
         seconds = minutes * 60;
+      } else {
+        // Only try to parse seconds if no minutes were found
+        // Try to parse "X seg" or "X segundo(s)" format
+        final secMatch = RegExp(r'(\d+)\s*(?:segundo|seg)(?:s)?', caseSensitive: false).firstMatch(timeValue);
+        if (secMatch != null) {
+          seconds = int.tryParse(secMatch.group(1) ?? '0') ?? 0;
+        } else {
+          // Try to parse plain number (assume minutes)
+          final number = int.tryParse(timeValue);
+          if (number != null && number > 0 && number <= 60) {
+            seconds = number * 60; // Convert to seconds
+          }
+        }
       }
     }
     
-    // Try to parse "X seg" format
-    final secMatch = RegExp(r'(\d+)\s*seg', caseSensitive: false).firstMatch(timeValue);
-    if (secMatch != null) {
-      seconds = int.tryParse(secMatch.group(1) ?? '');
-    }
-    
-    // Try to parse plain number (assume minutes)
-    if (seconds == null) {
-      final number = int.tryParse(timeValue);
-      if (number != null && number > 0 && number <= 60) {
-        seconds = number * 60; // Convert to seconds
-      }
-    }
-    
-    if (seconds != null && seconds > 0) {
+    if (seconds > 0) {
       // Don't start countdown automatically, just show the detected time
       setState(() {
-        _detectedSeconds = seconds!;
+        _detectedSeconds = seconds;
         _detectedTimeText = timeValue;
         _showCountdownPending = true;
         _showCountdown = false;
@@ -846,6 +855,9 @@ class _DiceRollerPageState extends State<DiceRollerPage>
           content: TextField(
             controller: _customTimeController,
             keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
             decoration: const InputDecoration(
               labelText: 'Segundos',
               hintText: 'Ingresa el tiempo en segundos',
