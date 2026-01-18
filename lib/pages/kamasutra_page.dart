@@ -325,7 +325,7 @@ class _KamasutraPageState extends State<KamasutraPage>
       child: Card(
         elevation: 8,
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(32.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -337,11 +337,11 @@ class _KamasutraPageState extends State<KamasutraPage>
                     child: Transform.rotate(
                       angle: _diceRotationAnimation.value * 2 * 3.14159,
                       child: Container(
-                        width: 35,
-                        height: 35,
+                        width: 80,
+                        height: 80,
                         decoration: BoxDecoration(
                           color: Colors.red.shade100,
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(24),
                           border: Border.all(
                             color: Colors.red.shade400,
                             width: 3,
@@ -349,7 +349,7 @@ class _KamasutraPageState extends State<KamasutraPage>
                         ),
                         child: Icon(
                           Icons.favorite,
-                          size: 18,
+                          size: 40,
                           color: Colors.red.shade400,
                         ),
                       ),
@@ -357,20 +357,20 @@ class _KamasutraPageState extends State<KamasutraPage>
                   );
                 },
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 12),
               const Text(
                 '¡Descubriendo tu posición!',
                 style: TextStyle(
-                  fontSize: 9,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.red,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
                 'Preparándote una sorpresa...',
                 style: TextStyle(
-                  fontSize: 9,
+                  fontSize: 14,
                   color: Colors.grey.shade600,
                 ),
               ),
