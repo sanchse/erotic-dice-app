@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
 
 import '../models/kamasutra_position.dart';
+import '../l10n/app_localizations.dart';
 
 /// Kamasutra dice page with image-based positions
 class KamasutraPage extends StatefulWidget {
@@ -76,29 +76,25 @@ class _KamasutraPageState extends State<KamasutraPage>
       _isLoading = true;
     });
 
-    try {
-      // Load positions from JSON file
-      final String jsonString = await rootBundle.loadString('assets/kamasutra/positions.json');
-      final Map<String, dynamic> jsonData = json.decode(jsonString);
-      final List<dynamic> positionsJson = jsonData['positions'];
-      
-      _positions = positionsJson
-          .map((json) => KamasutraPosition.fromJson(json))
-          .toList();
-          
-      debugPrint('Loaded ${_positions.length} Kamasutra positions');
-    } catch (e) {
-      debugPrint('Error loading positions from JSON: $e');
-      // Fallback to hardcoded positions if JSON loading fails
-      _positions = [
-        KamasutraPosition(id: 1, name: "Misionero", image: "missionary.svg", description: "Posición clásica cara a cara"),
-        KamasutraPosition(id: 2, name: "Doggy Style", image: "doggy.svg", description: "Posición desde atrás"),
-        KamasutraPosition(id: 3, name: "Cowgirl", image: "cowgirl.svg", description: "Ella arriba"),
-        KamasutraPosition(id: 4, name: "Reverse Cowgirl", image: "reverse_cowgirl.svg", description: "Ella arriba mirando hacia los pies"),
-        KamasutraPosition(id: 5, name: "Spooning", image: "spooning.svg", description: "De lado, ambos en la misma dirección"),
-        KamasutraPosition(id: 6, name: "Standing", image: "standing.svg", description: "De pie, ella apoyada"),
-      ];
-    }
+    // Define all positions with localization keys
+    _positions = [
+      KamasutraPosition(id: 1, name: "Missionary", nameKey: "positionMissionary", descKey: "positionMissionaryDesc", image: "missionary.svg", description: "Classic face-to-face position, he on top"),
+      KamasutraPosition(id: 2, name: "Doggy Style", nameKey: "positionDoggy", descKey: "positionDoggyDesc", image: "doggy.svg", description: "Position from behind"),
+      KamasutraPosition(id: 3, name: "Cowgirl", nameKey: "positionCowgirl", descKey: "positionCowgirlDesc", image: "cowgirl.svg", description: "She on top"),
+      KamasutraPosition(id: 4, name: "Reverse Cowgirl", nameKey: "positionReverseCowgirl", descKey: "positionReverseCowgirlDesc", image: "reverse_cowgirl.svg", description: "She on top facing his feet"),
+      KamasutraPosition(id: 5, name: "Stand and Carry", nameKey: "positionStandAndCarry", descKey: "positionStandAndCarryDesc", image: "stand_and_carry.svg", description: "He standing holding her"),
+      KamasutraPosition(id: 6, name: "Bodyguard", nameKey: "positionBodyguard", descKey: "positionBodyguardDesc", image: "bodyguard.svg", description: "He behind hugging her"),
+      KamasutraPosition(id: 7, name: "69", nameKey: "position69", descKey: "position69Desc", image: "69.svg", description: "Both enjoying orally"),
+      KamasutraPosition(id: 8, name: "Kneeling Blow Job", nameKey: "positionKneelingBlowJob", descKey: "positionKneelingBlowJobDesc", image: "kneeling_blow_job.svg", description: "He standing, she kneeling in front performing oral"),
+      KamasutraPosition(id: 9, name: "Prone", nameKey: "positionProne", descKey: "positionProneDesc", image: "prone.svg", description: "She face down, he on top"),
+      KamasutraPosition(id: 10, name: "Anvil", nameKey: "positionAnvil", descKey: "positionAnvilDesc", image: "anvil.svg", description: "She with legs very elevated, he on top"),
+      KamasutraPosition(id: 11, name: "Zeus", nameKey: "positionZeus", descKey: "positionZeusDesc", image: "zeus.svg", description: "She kneeling performing oral while he stands holding her head"),
+      KamasutraPosition(id: 12, name: "Hungry", nameKey: "positionHungry", descKey: "positionHungryDesc", image: "hungry.svg", description: "She lying down and he between her legs performing oral"),
+      KamasutraPosition(id: 13, name: "Dancer", nameKey: "positionDancer", descKey: "positionDancerDesc", image: "dancer.svg", description: "He standing, she standing facing him with one leg elevated around his waist"),
+      KamasutraPosition(id: 14, name: "Side Missionary", nameKey: "positionManMissionary", descKey: "positionManMissionaryDesc", image: "man_missionary.svg", description: "Both lying on their side, he behind her"),
+    ];
+    
+    debugPrint('Loaded ${_positions.length} Kamasutra positions');
 
     setState(() {
       _isLoading = false;
@@ -147,6 +143,7 @@ class _KamasutraPageState extends State<KamasutraPage>
   }
 
   Widget _buildImagePlaceholder() {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SizedBox(
@@ -165,7 +162,7 @@ class _KamasutraPageState extends State<KamasutraPage>
               ),
               const SizedBox(height: 8),
               Text(
-                'Imagen no disponible',
+                l10n.imageNotAvailable,
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.red.shade400,
@@ -181,9 +178,10 @@ class _KamasutraPageState extends State<KamasutraPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dados Kamasutra'),
+        title: Text(l10n.kamasutraTitle),
         centerTitle: true,
         backgroundColor: Colors.red.shade400,
         foregroundColor: Colors.white,
@@ -217,9 +215,9 @@ class _KamasutraPageState extends State<KamasutraPage>
                           color: Colors.red,
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Dados Kamasutra',
-                          style: TextStyle(
+                        Text(
+                          l10n.kamasutraTitle,
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.red,
@@ -227,7 +225,7 @@ class _KamasutraPageState extends State<KamasutraPage>
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Descubre nuevas posiciones con cada lanzamiento',
+                          l10n.discoverNewPositions,
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey.shade600,
@@ -267,7 +265,7 @@ class _KamasutraPageState extends State<KamasutraPage>
                             ),
                           )
                         : const Icon(Icons.casino),
-                    label: Text(_isRolling ? 'Lanzando...' : '¡Lanzar Dado!'),
+                    label: Text(_isRolling ? l10n.rolling : l10n.rollDice),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade400,
                       foregroundColor: Colors.white,
@@ -291,6 +289,7 @@ class _KamasutraPageState extends State<KamasutraPage>
   }
 
   Widget _buildInitialState() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Card(
         elevation: 4,
@@ -306,7 +305,7 @@ class _KamasutraPageState extends State<KamasutraPage>
               ),
               const SizedBox(height: 2),
               Text(
-                '¡Lanza el dado para descubrir\nuna nueva posición!',
+                l10n.launchDiceToDiscover,
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey.shade600,
@@ -321,6 +320,7 @@ class _KamasutraPageState extends State<KamasutraPage>
   }
 
   Widget _buildRollingAnimation() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Card(
         elevation: 8,
@@ -358,9 +358,9 @@ class _KamasutraPageState extends State<KamasutraPage>
                 },
               ),
               const SizedBox(height: 12),
-              const Text(
-                '¡Descubriendo tu posición!',
-                style: TextStyle(
+              Text(
+                l10n.discoveringPosition,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.red,
@@ -368,7 +368,7 @@ class _KamasutraPageState extends State<KamasutraPage>
               ),
               const SizedBox(height: 12),
               Text(
-                'Preparándote una sorpresa...',
+                l10n.preparingSurprise,
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey.shade600,
@@ -383,6 +383,20 @@ class _KamasutraPageState extends State<KamasutraPage>
 
   Widget _buildResult() {
     if (_currentPosition == null) return const SizedBox();
+
+    final l10n = AppLocalizations.of(context)!;
+    
+    // Get localized name and description
+    String localizedName = _currentPosition!.name;
+    String localizedDesc = _currentPosition!.description;
+    
+    // Use localization keys if available
+    if (_currentPosition!.nameKey != null) {
+      localizedName = _getLocalizedString(l10n, _currentPosition!.nameKey!) ?? _currentPosition!.name;
+    }
+    if (_currentPosition!.descKey != null) {
+      localizedDesc = _getLocalizedString(l10n, _currentPosition!.descKey!) ?? _currentPosition!.description;
+    }
 
     return FadeTransition(
       opacity: _resultFadeAnimation,
@@ -399,7 +413,7 @@ class _KamasutraPageState extends State<KamasutraPage>
                 children: [
                   // Position name
                   Text(
-                    _currentPosition!.name,
+                    localizedName,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -458,7 +472,7 @@ class _KamasutraPageState extends State<KamasutraPage>
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      _currentPosition!.description,
+                      localizedDesc,
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey.shade700,
@@ -475,5 +489,40 @@ class _KamasutraPageState extends State<KamasutraPage>
         ),
       ),
     );
+  }
+
+  // Helper method to get localized string by key
+  String? _getLocalizedString(AppLocalizations l10n, String key) {
+    switch (key) {
+      case 'positionMissionary': return l10n.positionMissionary;
+      case 'positionMissionaryDesc': return l10n.positionMissionaryDesc;
+      case 'positionDoggy': return l10n.positionDoggy;
+      case 'positionDoggyDesc': return l10n.positionDoggyDesc;
+      case 'positionCowgirl': return l10n.positionCowgirl;
+      case 'positionCowgirlDesc': return l10n.positionCowgirlDesc;
+      case 'positionReverseCowgirl': return l10n.positionReverseCowgirl;
+      case 'positionReverseCowgirlDesc': return l10n.positionReverseCowgirlDesc;
+      case 'positionStandAndCarry': return l10n.positionStandAndCarry;
+      case 'positionStandAndCarryDesc': return l10n.positionStandAndCarryDesc;
+      case 'positionBodyguard': return l10n.positionBodyguard;
+      case 'positionBodyguardDesc': return l10n.positionBodyguardDesc;
+      case 'position69': return l10n.position69;
+      case 'position69Desc': return l10n.position69Desc;
+      case 'positionKneelingBlowJob': return l10n.positionKneelingBlowJob;
+      case 'positionKneelingBlowJobDesc': return l10n.positionKneelingBlowJobDesc;
+      case 'positionProne': return l10n.positionProne;
+      case 'positionProneDesc': return l10n.positionProneDesc;
+      case 'positionAnvil': return l10n.positionAnvil;
+      case 'positionAnvilDesc': return l10n.positionAnvilDesc;
+      case 'positionZeus': return l10n.positionZeus;
+      case 'positionZeusDesc': return l10n.positionZeusDesc;
+      case 'positionHungry': return l10n.positionHungry;
+      case 'positionHungryDesc': return l10n.positionHungryDesc;
+      case 'positionDancer': return l10n.positionDancer;
+      case 'positionDancerDesc': return l10n.positionDancerDesc;
+      case 'positionManMissionary': return l10n.positionManMissionary;
+      case 'positionManMissionaryDesc': return l10n.positionManMissionaryDesc;
+      default: return null;
+    }
   }
 }

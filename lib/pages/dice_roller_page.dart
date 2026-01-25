@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audioplayers.dart';
+import '../l10n/app_localizations.dart';
 
 import '../models/dice.dart';
 import '../widgets/dice_widget.dart';
@@ -23,7 +24,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   int _numberOfDice = 3;
   
   // List of dice with their titles and options
-  late List<Dice> _diceList;
+  List<Dice> _diceList = [];
   
   // Results from the last roll
   List<String>? _rollResults;
@@ -170,18 +171,40 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   }
 
   void _initializeDice() {
+    final l10n = AppLocalizations.of(context)!;
     _diceList = [
       Dice(
-        title: 'Acción',
-        options: ['Besar', 'Lamer', 'Masajear', 'Tocar', 'Acariciar', 'Mordisquear'],
+        title: l10n.defaultDice1Title,
+        options: [
+          l10n.actionKiss,
+          l10n.actionLick,
+          l10n.actionMassage,
+          l10n.actionTouch,
+          l10n.actionCaress,
+          l10n.actionNibble,
+        ],
       ),
       Dice(
-        title: 'Parte del Cuerpo',
-        options: ['Cuello', 'Espalda', 'Genitales', 'Pezones', 'Culo', 'Labios'],
+        title: l10n.defaultDice2Title,
+        options: [
+          l10n.bodyPartNeck,
+          l10n.bodyPartBack,
+          l10n.bodyPartGenitals,
+          l10n.bodyPartNipples,
+          l10n.bodyPartButt,
+          l10n.bodyPartLips,
+        ],
       ),
       Dice(
-        title: 'Tiempo',
-        options: ['30 seg', '1 min', '2 min', '3 min', '5 min', '?'],
+        title: l10n.defaultDice3Title,
+        options: [
+          l10n.time30Sec,
+          l10n.time1Min,
+          l10n.time2Min,
+          l10n.time3Min,
+          l10n.time5Min,
+          '?',
+        ],
       ),
     ];
     _rollResults = null;
@@ -195,6 +218,13 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   }
 
   void _rollDice() async {
+    // Ensure dice list is initialized
+    if (_diceList.isEmpty || _diceList.length < _numberOfDice) {
+      debugPrint('Dice list not properly initialized, initializing now');
+      _initializeDice();
+      await _saveConfiguration();
+    }
+    
     setState(() {
       _isRolling = true;
       _rollResults = null;
@@ -366,29 +396,30 @@ class _DiceRollerPageState extends State<DiceRollerPage>
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
+        final l10n = AppLocalizations.of(dialogContext)!;
         return AlertDialog(
-          title: const Text('Tiempo Personalizado'),
+          title: Text(l10n.customTime),
           content: TextField(
             controller: _customTimeController,
             keyboardType: TextInputType.number,
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,
             ],
-            decoration: const InputDecoration(
-              labelText: 'Segundos',
-              hintText: 'Ingresa el tiempo en segundos',
+            decoration: InputDecoration(
+              labelText: l10n.seconds,
+              hintText: l10n.enterTimeInSeconds,
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancelar'),
+              child: Text(l10n.cancel),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
             ),
             TextButton(
-              child: const Text('Confirmar'),
+              child: Text(l10n.confirm),
               onPressed: () {
                 final seconds = int.tryParse(_customTimeController.text);
                 if (seconds != null && seconds > 0) {
@@ -399,7 +430,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     _showCountdown = false;
                   });
                 }
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
             ),
           ],
@@ -409,17 +440,18 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   }
 
   void _showCountdownFinishedDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text('¡Tiempo Terminado!'),
-          content: const Text('El contador regresivo ha llegado a cero.'),
+          title: Text(l10n.timeFinished),
+          content: Text(l10n.countdownReachedZero),
           actions: <Widget>[
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
                 setState(() {
                   _showCountdown = false;
                 });
@@ -432,20 +464,19 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   }
 
   void _showResetConfirmationDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text('Restaurar Valores Predeterminados'),
-          content: const Text(
-            'Esto restaurará todos los títulos y opciones de los dados a sus valores predeterminados. ¿Estás seguro?',
-          ),
+          title: Text(l10n.restoreDefaults),
+          content: Text(l10n.restoreDefaultsConfirmation),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancelar'),
+              child: Text(l10n.cancel),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
             ),
             ElevatedButton(
@@ -453,15 +484,17 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Restaurar'),
+              child: Text(l10n.restore),
               onPressed: () {
                 _resetToDefaults();
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Dados restaurados a la configuración predeterminada'),
-                  ),
-                );
+                Navigator.of(dialogContext).pop();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.dicesRestoredToDefault),
+                    ),
+                  );
+                }
               },
             ),
           ],
@@ -471,21 +504,22 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   }
 
   void _showDebugDialog() async {
+    final l10n = AppLocalizations.of(context)!;
     final prefs = await SharedPreferences.getInstance();
     final savedConfig = prefs.getString('dice_configuration');
     
     if (!mounted) return;
     return showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text('Debug Persistencia'),
+          title: Text(l10n.debugPersistence),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Configuración guardada:'),
+                Text(l10n.savedConfiguration),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(8),
@@ -494,7 +528,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    savedConfig ?? 'No hay configuración guardada',
+                    savedConfig ?? l10n.noSavedConfiguration,
                     style: const TextStyle(
                       fontFamily: 'monospace',
                       fontSize: 12,
@@ -502,30 +536,32 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text('Configuración actual:'),
+                Text(l10n.currentConfiguration),
                 const SizedBox(height: 8),
-                Text('Número de dados: $_numberOfDice'),
+                Text(l10n.numberOfDiceColon(_numberOfDice)),
                 for (int i = 0; i < _diceList.length; i++)
-                  Text('Dado ${i + 1}: ${_diceList[i].title} - ${_diceList[i].options.join(", ")}'),
+                  Text('${l10n.dice(i + 1)}: ${_diceList[i].title} - ${_diceList[i].options.join(", ")}'),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Guardar Ahora'),
+              child: Text(l10n.saveNow),
               onPressed: () async {
                 await _saveConfiguration();
-                if (!context.mounted) return;
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Configuración guardada manualmente')),
-                );
+                if (!dialogContext.mounted) return;
+                Navigator.of(dialogContext).pop();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.configurationSavedManually)),
+                  );
+                }
               },
             ),
             TextButton(
-              child: const Text('Cerrar'),
+              child: Text(l10n.close),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(dialogContext).pop();
               },
             ),
           ],
@@ -562,9 +598,11 @@ class _DiceRollerPageState extends State<DiceRollerPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dados Eróticos'),
+        title: Text(l10n.eroticDiceTitle),
         elevation: 2,
         actions: [
           PopupMenuButton<String>(
@@ -596,33 +634,33 @@ class _DiceRollerPageState extends State<DiceRollerPage>
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'config',
                 child: Row(
                   children: [
-                    Icon(Icons.settings),
-                    SizedBox(width: 8),
-                    Text('Configuración'),
+                    const Icon(Icons.settings),
+                    const SizedBox(width: 8),
+                    Text(l10n.configuration),
                   ],
                 ),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'reset',
                 child: Row(
                   children: [
-                    Icon(Icons.refresh),
-                    SizedBox(width: 8),
-                    Text('Restaurar Valores Predeterminados'),
+                    const Icon(Icons.refresh),
+                    const SizedBox(width: 8),
+                    Text(l10n.restoreDefaults),
                   ],
                 ),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'debug',
                 child: Row(
                   children: [
-                    Icon(Icons.bug_report),
-                    SizedBox(width: 8),
-                    Text('Debug Persistencia'),
+                    const Icon(Icons.bug_report),
+                    const SizedBox(width: 8),
+                    Text(l10n.debugPersistence),
                   ],
                 ),
               ),
@@ -632,13 +670,13 @@ class _DiceRollerPageState extends State<DiceRollerPage>
       ),
       body: SafeArea(
         child: _isLoading 
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Cargando tu configuración de dados...'),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.loadingYourDiceConfiguration),
                 ],
               ),
             )
@@ -648,7 +686,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildRollButton(),
+                    _buildRollButton(context),
                     const SizedBox(height: 24),
                     
                     if (_isRolling) _buildAnimatedDiceSection(),
@@ -657,7 +695,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     if (_rollResults != null && !_isRolling) 
                       FadeTransition(
                         opacity: _resultFadeAnimation,
-                        child: _buildResultsDisplay(),
+                        child: _buildResultsDisplay(context),
                       ),
                   ],
                 ),
@@ -667,7 +705,8 @@ class _DiceRollerPageState extends State<DiceRollerPage>
     );
   }
 
-  Widget _buildRollButton() {
+  Widget _buildRollButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ElevatedButton(
       onPressed: _isRolling ? null : _rollDice,
       style: ElevatedButton.styleFrom(
@@ -697,7 +736,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
             const Icon(Icons.casino, size: 28),
           const SizedBox(width: 12),
           Text(
-            _isRolling ? 'Lanzando...' : 'Lanzar Dados',
+            _isRolling ? l10n.rolling : l10n.rollDice,
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -708,7 +747,8 @@ class _DiceRollerPageState extends State<DiceRollerPage>
     );
   }
 
-  Widget _buildResultsDisplay() {
+  Widget _buildResultsDisplay(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       elevation: 4,
       child: Padding(
@@ -716,9 +756,9 @@ class _DiceRollerPageState extends State<DiceRollerPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              '¡Resultado!',
-              style: TextStyle(
+            Text(
+              l10n.result,
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colors.pink,
@@ -766,6 +806,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   }
 
   Widget _buildCountdownWidget() {
+    final l10n = AppLocalizations.of(context)!;
     final minutes = _countdownSeconds ~/ 60;
     final seconds = _countdownSeconds % 60;
     final timeString = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
@@ -793,7 +834,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    _isCountdownPaused ? 'Contador Pausado' : 'Contador Regresivo',
+                    _isCountdownPaused ? l10n.countdownPaused : l10n.countdownTimer,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -824,7 +865,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     ElevatedButton.icon(
                       onPressed: _pauseCountdown,
                       icon: const Icon(Icons.pause),
-                      label: const Text('Pausar'),
+                      label: Text(l10n.pause),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
                         foregroundColor: Colors.white,
@@ -834,7 +875,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     ElevatedButton.icon(
                       onPressed: _resumeCountdown,
                       icon: const Icon(Icons.play_arrow),
-                      label: const Text('Reanudar'),
+                      label: Text(l10n.resume),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
@@ -848,7 +889,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                       });
                     },
                     icon: const Icon(Icons.close),
-                    label: const Text('Cerrar'),
+                    label: Text(l10n.close),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
@@ -864,6 +905,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   }
 
   Widget _buildCountdownPendingWidget() {
+    final l10n = AppLocalizations.of(context)!;
     final minutes = _detectedSeconds ~/ 60;
     final seconds = _detectedSeconds % 60;
     final timeString = minutes > 0 
@@ -879,18 +921,18 @@ class _DiceRollerPageState extends State<DiceRollerPage>
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.timer_outlined,
                     color: Colors.green,
                     size: 24,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    'Tiempo Detectado',
-                    style: TextStyle(
+                    l10n.timeDetected,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
@@ -900,7 +942,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
               ),
               const SizedBox(height: 8),
               Text(
-                'Resultado: $_detectedTimeText',
+                l10n.resultWithTime(_detectedTimeText),
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[600],
@@ -918,7 +960,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
               ),
               const SizedBox(height: 16),
               Text(
-                '¿Listo para comenzar el contador?',
+                l10n.readyToStartCounter,
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[700],
@@ -936,7 +978,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                       });
                     },
                     icon: const Icon(Icons.close),
-                    label: const Text('Cancelar'),
+                    label: Text(l10n.cancel),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey,
                       foregroundColor: Colors.white,
@@ -950,7 +992,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                       _startCountdown(_detectedSeconds);
                     },
                     icon: const Icon(Icons.play_arrow),
-                    label: const Text('Iniciar'),
+                    label: Text(l10n.start),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,

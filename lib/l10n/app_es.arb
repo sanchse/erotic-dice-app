@@ -1,0 +1,629 @@
+{
+  "@@locale": "es",
+  
+  "appTitle": "Dados Eróticos",
+  "@appTitle": {
+    "description": "Title of the application"
+  },
+
+  "mainMenuTitle": "Dados Eróticos",
+  "@mainMenuTitle": {
+    "description": "Main menu page title"
+  },
+
+  "mainMenuSubtitle": "Elige tu modo de juego",
+  "@mainMenuSubtitle": {
+    "description": "Main menu page subtitle"
+  },
+
+  "eroticDiceTitle": "Dados Eróticos",
+  "@eroticDiceTitle": {
+    "description": "Erotic dice card title"
+  },
+
+  "eroticDiceSubtitle": "Lanza los dados y disfruta",
+  "@eroticDiceSubtitle": {
+    "description": "Erotic dice card subtitle"
+  },
+
+  "kamasutraDiceTitle": "Dados Kamasutra",
+  "@kamasutraDiceTitle": {
+    "description": "Kamasutra dice card title"
+  },
+
+  "kamasutraDiceSubtitle": "Descubre nuevas posiciones",
+  "@kamasutraDiceSubtitle": {
+    "description": "Kamasutra dice card subtitle"
+  },
+
+  "rollDice": "Lanzar Dados",
+  "@rollDice": {
+    "description": "Roll dice button"
+  },
+
+  "rolling": "Lanzando...",
+  "@rolling": {
+    "description": "Rolling dice status"
+  },
+
+  "result": "¡Resultado!",
+  "@result": {
+    "description": "Result label"
+  },
+
+  "configuration": "Configuración",
+  "@configuration": {
+    "description": "Configuration menu option"
+  },
+
+  "diceConfiguration": "Configuración de Dados",
+  "@diceConfiguration": {
+    "description": "Dice configuration page title"
+  },
+
+  "numberOfDice": "Número de Dados",
+  "@numberOfDice": {
+    "description": "Number of dice selector label"
+  },
+
+  "restoreDefaults": "Restaurar Valores Predeterminados",
+  "@restoreDefaults": {
+    "description": "Restore defaults option"
+  },
+
+  "restoreDefaultsConfirmation": "Esto restaurará todos los títulos y opciones de los dados a sus valores predeterminados. ¿Estás seguro?",
+  "@restoreDefaultsConfirmation": {
+    "description": "Confirmation message for restoring defaults"
+  },
+
+  "restore": "Restaurar",
+  "@restore": {
+    "description": "Restore button in confirmation dialog"
+  },
+
+  "applyChanges": "Aplicar Cambios",
+  "@applyChanges": {
+    "description": "Apply changes button"
+  },
+
+  "cancel": "Cancelar",
+  "@cancel": {
+    "description": "Cancel button"
+  },
+
+  "save": "Guardar",
+  "@save": {
+    "description": "Save button"
+  },
+
+  "close": "Cerrar",
+  "@close": {
+    "description": "Close button"
+  },
+
+  "editOptions": "Editar Opciones",
+  "@editOptions": {
+    "description": "Edit options button"
+  },
+
+  "editOptionsFor": "Editar Opciones para {diceName}",
+  "@editOptionsFor": {
+    "description": "Edit options dialog title",
+    "placeholders": {
+      "diceName": {
+        "type": "String",
+        "example": "Acción"
+      }
+    }
+  },
+
+  "enterEachOption": "Ingresa cada opción en una nueva línea (máximo 6 opciones):",
+  "@enterEachOption": {
+    "description": "Instructions for editing options"
+  },
+
+  "missingOptionsWillShow": "Las opciones faltantes se mostrarán como \"?\" en el dado.",
+  "@missingOptionsWillShow": {
+    "description": "Missing options explanation"
+  },
+
+  "optionsSavedSuccessfully": "Opciones guardadas exitosamente",
+  "@optionsSavedSuccessfully": {
+    "description": "Success message for saving options"
+  },
+
+  "addOption": "Agregar Opción",
+  "@addOption": {
+    "description": "Add option button"
+  },
+
+  "addOptionTo": "Agregar Opción a {diceName}",
+  "@addOptionTo": {
+    "description": "Add option dialog title",
+    "placeholders": {
+      "diceName": {
+        "type": "String"
+      }
+    }
+  },
+
+  "newOption": "Nueva opción",
+  "@newOption": {
+    "description": "New option placeholder"
+  },
+
+  "optionAddedSuccessfully": "Opción \"{optionName}\" agregada exitosamente",
+  "@optionAddedSuccessfully": {
+    "description": "Success message for adding option",
+    "placeholders": {
+      "optionName": {
+        "type": "String"
+      }
+    }
+  },
+
+  "thisOptionAlreadyExists": "Esta opción ya existe",
+  "@thisOptionAlreadyExists": {
+    "description": "Error message for duplicate option"
+  },
+
+  "configurationAppliedSuccessfully": "Configuración aplicada exitosamente",
+  "@configurationAppliedSuccessfully": {
+    "description": "Success message for applying configuration"
+  },
+
+  "dicesRestoredToDefault": "Dados restaurados a la configuración predeterminada",
+  "@dicesRestoredToDefault": {
+    "description": "Success message for restoring defaults"
+  },
+
+  "countdownTimer": "Contador Regresivo",
+  "@countdownTimer": {
+    "description": "Countdown timer label"
+  },
+
+  "countdownPaused": "Contador Pausado",
+  "@countdownPaused": {
+    "description": "Countdown paused label"
+  },
+
+  "pause": "Pausar",
+  "@pause": {
+    "description": "Pause button"
+  },
+
+  "resume": "Reanudar",
+  "@resume": {
+    "description": "Resume button"
+  },
+
+  "timeDetected": "Tiempo Detectado",
+  "@timeDetected": {
+    "description": "Time detected label"
+  },
+
+  "resultWithTime": "Resultado: {time}",
+  "@resultWithTime": {
+    "description": "Result with time",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+
+  "readyToStartCounter": "¿Listo para comenzar el contador?",
+  "@readyToStartCounter": {
+    "description": "Ready to start counter question"
+  },
+
+  "start": "Iniciar",
+  "@start": {
+    "description": "Start button"
+  },
+
+  "timeFinished": "¡Tiempo Terminado!",
+  "@timeFinished": {
+    "description": "Time finished alert title"
+  },
+
+  "countdownReachedZero": "El contador regresivo ha llegado a cero.",
+  "@countdownReachedZero": {
+    "description": "Countdown reached zero message"
+  },
+
+  "customTime": "Tiempo Personalizado",
+  "@customTime": {
+    "description": "Custom time dialog title"
+  },
+
+  "seconds": "Segundos",
+  "@seconds": {
+    "description": "Seconds label"
+  },
+
+  "enterTimeInSeconds": "Ingresa el tiempo en segundos",
+  "@enterTimeInSeconds": {
+    "description": "Enter time hint"
+  },
+
+  "confirm": "Confirmar",
+  "@confirm": {
+    "description": "Confirm button"
+  },
+
+  "kamasutraTitle": "Dados Kamasutra",
+  "@kamasutraTitle": {
+    "description": "Kamasutra page title"
+  },
+
+  "discoverNewPositions": "Descubre nuevas posiciones con cada lanzamiento",
+  "@discoverNewPositions": {
+    "description": "Kamasutra page subtitle"
+  },
+
+  "discoveringPosition": "¡Descubriendo tu posición!",
+  "@discoveringPosition": {
+    "description": "Discovering position message"
+  },
+
+  "preparingSurprise": "Preparándote una sorpresa...",
+  "@preparingSurprise": {
+    "description": "Preparing surprise message"
+  },
+
+  "launchDiceToDiscover": "¡Lanza el dado para descubrir\\nuna nueva posición!",
+  "@launchDiceToDiscover": {
+    "description": "Launch dice to discover message"
+  },
+
+  "imageNotAvailable": "Imagen no disponible",
+  "@imageNotAvailable": {
+    "description": "Image not available message"
+  },
+
+  "debugPersistence": "Debug Persistencia",
+  "@debugPersistence": {
+    "description": "Debug persistence dialog title"
+  },
+
+  "savedConfiguration": "Configuración guardada:",
+  "@savedConfiguration": {
+    "description": "Saved configuration label"
+  },
+
+  "noSavedConfiguration": "No hay configuración guardada",
+  "@noSavedConfiguration": {
+    "description": "No saved configuration message"
+  },
+
+  "currentConfiguration": "Configuración actual:",
+  "@currentConfiguration": {
+    "description": "Current configuration label"
+  },
+
+  "saveNow": "Guardar Ahora",
+  "@saveNow": {
+    "description": "Save now button"
+  },
+
+  "configurationSavedManually": "Configuración guardada manualmente",
+  "@configurationSavedManually": {
+    "description": "Configuration saved manually message"
+  },
+
+  "configurationSavedManually": "Configuración guardada manualmente",
+  "@configurationSavedManually": {
+    "description": "Configuration saved manually message"
+  },
+
+  "dice": "Dado {number}",
+  "@dice": {
+    "description": "Dice label with number",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+
+  "numberOfDiceColon": "Número de dados: {count}",
+  "@numberOfDiceColon": {
+    "description": "Number of dice display",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+
+  "loadingYourDiceConfiguration": "Cargando tu configuración de dados...",
+  "@loadingYourDiceConfiguration": {
+    "description": "Loading configuration message"
+  },
+
+  "settings": "Ajustes",
+  "@settings": {
+    "description": "Settings menu option"
+  },
+
+  "language": "Idioma",
+  "@language": {
+    "description": "Language label"
+  },
+
+  "selectLanguage": "Seleccionar Idioma",
+  "@selectLanguage": {
+    "description": "Select language dialog title"
+  },
+
+  "spanish": "Español",
+  "@spanish": {
+    "description": "Spanish language name"
+  },
+
+  "english": "English",
+  "@english": {
+    "description": "English language name"
+  },
+
+  "french": "Français",
+  "@french": {
+    "description": "French language name"
+  },
+
+  "german": "Deutsch",
+  "@german": {
+    "description": "German language name"
+  },
+
+  "italian": "Italiano",
+  "@italian": {
+    "description": "Italian language name"
+  },
+
+  "portuguese": "Português",
+  "@portuguese": {
+    "description": "Portuguese language name"
+  },
+
+  "defaultDice1Title": "Acción",
+  "@defaultDice1Title": {
+    "description": "Default title for first dice (Action)"
+  },
+
+  "defaultDice2Title": "Parte del Cuerpo",
+  "@defaultDice2Title": {
+    "description": "Default title for second dice (Body Part)"
+  },
+
+  "defaultDice3Title": "Tiempo",
+  "@defaultDice3Title": {
+    "description": "Default title for third dice (Time)"
+  },
+
+  "actionKiss": "Besar",
+  "@actionKiss": {
+    "description": "Action option: Kiss"
+  },
+
+  "actionLick": "Lamer",
+  "@actionLick": {
+    "description": "Action option: Lick"
+  },
+
+  "actionMassage": "Masajear",
+  "@actionMassage": {
+    "description": "Action option: Massage"
+  },
+
+  "actionTouch": "Tocar",
+  "@actionTouch": {
+    "description": "Action option: Touch"
+  },
+
+  "actionCaress": "Acariciar",
+  "@actionCaress": {
+    "description": "Action option: Caress"
+  },
+
+  "actionNibble": "Mordisquear",
+  "@actionNibble": {
+    "description": "Action option: Nibble"
+  },
+
+  "bodyPartNeck": "Cuello",
+  "@bodyPartNeck": {
+    "description": "Body part option: Neck"
+  },
+
+  "bodyPartBack": "Espalda",
+  "@bodyPartBack": {
+    "description": "Body part option: Back"
+  },
+
+  "bodyPartGenitals": "Genitales",
+  "@bodyPartGenitals": {
+    "description": "Body part option: Genitals"
+  },
+
+  "bodyPartNipples": "Pezones",
+  "@bodyPartNipples": {
+    "description": "Body part option: Nipples"
+  },
+
+  "bodyPartButt": "Culo",
+  "@bodyPartButt": {
+    "description": "Body part option: Butt"
+  },
+
+  "bodyPartLips": "Labios",
+  "@bodyPartLips": {
+    "description": "Body part option: Lips"
+  },
+
+  "time30Sec": "30 seg",
+  "@time30Sec": {
+    "description": "Time option: 30 seconds"
+  },
+
+  "time1Min": "1 min",
+  "@time1Min": {
+    "description": "Time option: 1 minute"
+  },
+
+  "time2Min": "2 min",
+  "@time2Min": {
+    "description": "Time option: 2 minutes"
+  },
+
+  "time3Min": "3 min",
+  "@time3Min": {
+    "description": "Time option: 3 minutes"
+  },
+
+  "time5Min": "5 min",
+  "@time5Min": {
+    "description": "Time option: 5 minutes"
+  },
+
+  "positionMissionary": "Misionero",
+  "@positionMissionary": {
+    "description": "Kamasutra position: Missionary"
+  },
+
+  "positionMissionaryDesc": "Posición clásica cara a cara, él encima",
+  "@positionMissionaryDesc": {
+    "description": "Missionary position description"
+  },
+
+  "positionDoggy": "Perrito",
+  "@positionDoggy": {
+    "description": "Kamasutra position: Doggy Style"
+  },
+
+  "positionDoggyDesc": "Posición desde atrás",
+  "@positionDoggyDesc": {
+    "description": "Doggy Style position description"
+  },
+
+  "positionCowgirl": "Vaquera",
+  "@positionCowgirl": {
+    "description": "Kamasutra position: Cowgirl"
+  },
+
+  "positionCowgirlDesc": "Ella arriba",
+  "@positionCowgirlDesc": {
+    "description": "Cowgirl position description"
+  },
+
+  "positionReverseCowgirl": "Vaquera Invertida",
+  "@positionReverseCowgirl": {
+    "description": "Kamasutra position: Reverse Cowgirl"
+  },
+
+  "positionReverseCowgirlDesc": "Ella arriba mirando hacia los pies",
+  "@positionReverseCowgirlDesc": {
+    "description": "Reverse Cowgirl position description"
+  },
+
+  "positionStandAndCarry": "De pie y cargando",
+  "@positionStandAndCarry": {
+    "description": "Kamasutra position: Stand and Carry"
+  },
+
+  "positionStandAndCarryDesc": "Él de pie sosteniéndola",
+  "@positionStandAndCarryDesc": {
+    "description": "Stand and Carry position description"
+  },
+
+  "positionBodyguard": "Guardaespaldas",
+  "@positionBodyguard": {
+    "description": "Kamasutra position: Bodyguard"
+  },
+
+  "positionBodyguardDesc": "Él detrás abrazándola",
+  "@positionBodyguardDesc": {
+    "description": "Bodyguard position description"
+  },
+
+  "position69": "69",
+  "@position69": {
+    "description": "Kamasutra position: 69"
+  },
+
+  "position69Desc": "Ambos disfrutando oralmente",
+  "@position69Desc": {
+    "description": "69 position description"
+  },
+
+  "positionKneelingBlowJob": "Arrodillada",
+  "@positionKneelingBlowJob": {
+    "description": "Kamasutra position: Kneeling Blow Job"
+  },
+
+  "positionKneelingBlowJobDesc": "Él de pie, ella arrodillada frente a él realizando sexo oral",
+  "@positionKneelingBlowJobDesc": {
+    "description": "Kneeling Blow Job position description"
+  },
+
+  "positionProne": "Boca Abajo",
+  "@positionProne": {
+    "description": "Kamasutra position: Prone"
+  },
+
+  "positionProneDesc": "Ella boca abajo, él encima",
+  "@positionProneDesc": {
+    "description": "Prone position description"
+  },
+
+  "positionAnvil": "Yunque",
+  "@positionAnvil": {
+    "description": "Kamasutra position: Anvil"
+  },
+
+  "positionAnvilDesc": "Ella con piernas muy elevadas, él encima",
+  "@positionAnvilDesc": {
+    "description": "Anvil position description"
+  },
+
+  "positionZeus": "Zeus",
+  "@positionZeus": {
+    "description": "Kamasutra position: Zeus"
+  },
+
+  "positionZeusDesc": "Ella de rodilla realizando sexo oral mientras él está de pie sujetando la cabeza",
+  "@positionZeusDesc": {
+    "description": "Zeus position description"
+  },
+
+  "positionHungry": "Hambriento",
+  "@positionHungry": {
+    "description": "Kamasutra position: Hungry"
+  },
+
+  "positionHungryDesc": "Ella tumbada y él entre sus piernas realizando sexo oral",
+  "@positionHungryDesc": {
+    "description": "Hungry position description"
+  },
+
+  "positionDancer": "Bailarines",
+  "@positionDancer": {
+    "description": "Kamasutra position: Dancer"
+  },
+
+  "positionDancerDesc": "Él de pie, ella de pie frente a él con una pierna elevada alrededor de su cintura",
+  "@positionDancerDesc": {
+    "description": "Dancer position description"
+  },
+
+  "positionManMissionary": "Misionero de Lado",
+  "@positionManMissionary": {
+    "description": "Kamasutra position: Side Missionary"
+  },
+
+  "positionManMissionaryDesc": "Ambos acostados de lado, él detrás de ella",
+  "@positionManMissionaryDesc": {
+    "description": "Side Missionary position description"
+  }
+}
