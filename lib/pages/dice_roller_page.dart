@@ -39,7 +39,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   late AnimationController _diceAnimationController;
   late AnimationController _resultAnimationController;
   late Animation<double> _diceRotationAnimation;
-  late Animation<double> _diceScaleAnimation;
   late Animation<double> _resultFadeAnimation;
   
   // Countdown timer functionality
@@ -51,7 +50,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
   bool _isCountdownActive = false;
   bool _isCountdownPaused = false;
   bool _showCountdownPending = false;
-  TextEditingController _customTimeController = TextEditingController();
+  final TextEditingController _customTimeController = TextEditingController();
 
   @override
   void initState() {
@@ -73,14 +72,6 @@ class _DiceRollerPageState extends State<DiceRollerPage>
     ).animate(CurvedAnimation(
       parent: _diceAnimationController,
       curve: Curves.easeInOut,
-    ));
-    
-    _diceScaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _diceAnimationController,
-      curve: Curves.elasticInOut,
     ));
     
     _resultFadeAnimation = Tween<double>(
@@ -483,6 +474,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
     final prefs = await SharedPreferences.getInstance();
     final savedConfig = prefs.getString('dice_configuration');
     
+    if (!mounted) return;
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -493,24 +485,24 @@ class _DiceRollerPageState extends State<DiceRollerPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Configuración guardada:'),
+                const Text('Configuración guardada:'),
                 const SizedBox(height: 8),
                 Container(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     savedConfig ?? 'No hay configuración guardada',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'monospace',
                       fontSize: 12,
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text('Configuración actual:'),
+                const Text('Configuración actual:'),
                 const SizedBox(height: 8),
                 Text('Número de dados: $_numberOfDice'),
                 for (int i = 0; i < _diceList.length; i++)
@@ -523,6 +515,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
               child: const Text('Guardar Ahora'),
               onPressed: () async {
                 await _saveConfiguration();
+                if (!context.mounted) return;
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Configuración guardada manualmente')),
@@ -874,8 +867,8 @@ class _DiceRollerPageState extends State<DiceRollerPage>
     final minutes = _detectedSeconds ~/ 60;
     final seconds = _detectedSeconds % 60;
     final timeString = minutes > 0 
-        ? (seconds > 0 ? '${minutes}m ${seconds}s' : '${minutes} min')
-        : '${seconds} seg';
+        ? (seconds > 0 ? '${minutes}m ${seconds}s' : '$minutes min')
+        : '$seconds seg';
     
     return Container(
       margin: const EdgeInsets.only(top: 20),
@@ -886,7 +879,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
@@ -894,7 +887,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
                     color: Colors.green,
                     size: 24,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Text(
                     'Tiempo Detectado',
                     style: TextStyle(
@@ -916,7 +909,7 @@ class _DiceRollerPageState extends State<DiceRollerPage>
               const SizedBox(height: 12),
               Text(
                 timeString,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
                   color: Colors.green,

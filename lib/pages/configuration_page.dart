@@ -349,22 +349,19 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                 runSpacing: 4,
                 children: [
                   // Existing option chips with delete functionality
-                  ..._localDiceList[index].options.asMap().entries.map((entry) {
-                    int optionIndex = entry.key;
-                    String option = entry.value;
-                    return Chip(
+                  for (var entry in _localDiceList[index].options.asMap().entries)
+                    Chip(
                       label: Text(
-                        option,
+                        entry.value,
                         style: const TextStyle(fontSize: 12),
                       ),
                       deleteIcon: const Icon(Icons.close, size: 16),
                       onDeleted: _localDiceList[index].options.length > 1 
-                          ? () => _removeOption(index, optionIndex)
-                          : null, // Prevent deleting if only one option left
+                          ? () => _removeOption(index, entry.key)
+                          : null,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       visualDensity: VisualDensity.compact,
-                    );
-                  }).toList(),
+                    ),
                   // Add option chip (only show if less than 6 options)
                   if (_localDiceList[index].options.length < 6)
                     ActionChip(

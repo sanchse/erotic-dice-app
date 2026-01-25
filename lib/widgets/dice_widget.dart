@@ -44,7 +44,7 @@ class DiceWidget extends StatelessWidget {
   }
 
   Widget _buildDice() {
-    return Container(
+    return SizedBox(
       width: size,
       height: size,
       child: CustomPaint(
@@ -78,7 +78,7 @@ class DicePainter extends CustomPainter {
 
     // Enhanced shadow
     final shadowPaint = Paint()
-      ..color = Colors.black.withOpacity(0.2)
+      ..color = Colors.black.withValues(alpha: 0.2)
       ..style = PaintingStyle.fill
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
 
@@ -179,9 +179,9 @@ class DicePainter extends CustomPainter {
             color: Colors.black87,
             fontSize: _calculateFontSize(displayText, cubeSize),
             fontWeight: FontWeight.bold,
-            shadows: [
+            shadows: const [
               Shadow(
-                offset: const Offset(0.5, 0.5),
+                offset: Offset(0.5, 0.5),
                 blurRadius: 0.5,
                 color: Colors.black38,
               ),
